@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Administrador | Frantz TopUp SPA</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="login" class="login-screen">
+    <div class="login-card">
+      <div class="brand">FT<span>S.A.</span></div>
+      <h1>Panel Administrador</h1>
+      <p>Frantz TopUp SPA</p>
+      <input id="user" type="text" placeholder="Usuario">
+      <input id="password" type="password" placeholder="Contraseña">
+      <button onclick="login()">Ingresar</button>
+      <small>Demo visual: no conecta todavía con una base de datos.</small>
+    </div>
+  </div>
+
+  <div id="app" class="app hidden">
+    <aside class="sidebar">
+      <div class="brand">FT<span>S.A.</span></div>
+      <div class="company">Frantz TopUp SPA</div>
+      <nav>
+        <button class="nav active" onclick="showSection('dashboard', this)">📊 Dashboard</button>
+        <button class="nav" onclick="showSection('agents', this)">👥 Agentes</button>
+        <button class="nav" onclick="showSection('operations', this)">💳 Operaciones</button>
+        <button class="nav" onclick="showSection('balances', this)">💰 Saldos</button>
+        <button class="nav" onclick="showSection('commissions', this)">📈 Comisiones</button>
+        <button class="nav" onclick="showSection('settings', this)">⚙️ Configuración</button>
+      </nav>
+      <button class="logout" onclick="logout()">Cerrar sesión</button>
+    </aside>
+
+    <main class="content">
+      <header>
+        <div>
+          <h2 id="sectionTitle">Dashboard</h2>
+          <p>Control general de la plataforma</p>
+        </div>
+        <div class="admin-badge">Administrador</div>
+      </header>
+
+      <section id="dashboard" class="section">
+        <div class="cards">
+          <div class="card"><span>Agentes activos</span><strong>24</strong><small>+3 este mes</small></div>
+          <div class="card"><span>Operaciones hoy</span><strong>186</strong><small>Actualización en tiempo real</small></div>
+          <div class="card"><span>Saldo total</span><strong>$8.450.000</strong><small>CLP</small></div>
+          <div class="card"><span>Comisiones</span><strong>$425.800</strong><small>Periodo actual</small></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>Últimas operaciones</h3><button class="secondary">Ver todas</button></div>
+          <table>
+            <thead><tr><th>ID</th><th>Agente</th><th>Servicio</th><th>Monto</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>#FT1028</td><td>Agente 01</td><td>MonCash</td><td>$75.000</td><td><span class="status ok">Completada</span></td></tr>
+              <tr><td>#FT1027</td><td>Agente 07</td><td>NatCash</td><td>$120.000</td><td><span class="status pending">Pendiente</span></td></tr>
+              <tr><td>#FT1026</td><td>Agente 03</td><td>TopUp</td><td>$50.000</td><td><span class="status ok">Completada</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="agents" class="section hidden">
+        <div class="toolbar"><input placeholder="Buscar agente..."><button>+ Nuevo agente</button></div>
+        <div class="panel"><h3>Gestión de agentes</h3><table>
+          <thead><tr><th>Nombre</th><th>Usuario</th><th>Saldo</th><th>Estado</th><th>Acción</th></tr></thead>
+          <tbody>
+            <tr><td>Agente 01</td><td>agent01</td><td>$850.000</td><td><span class="status ok">Activo</span></td><td><button class="mini">Editar</button></td></tr>
+            <tr><td>Agente 02</td><td>agent02</td><td>$420.000</td><td><span class="status ok">Activo</span></td><td><button class="mini">Editar</button></td></tr>
+            <tr><td>Agente 03</td><td>agent03</td><td>$190.000</td><td><span class="status off">Inactivo</span></td><td><button class="mini">Editar</button></td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section id="operations" class="section hidden">
+        <div class="panel"><h3>Registro de operaciones</h3><p class="muted">Aquí se podrán revisar comprobantes, montos, servicios y estados.</p>
+          <table><thead><tr><th>ID</th><th>Fecha</th><th>Agente</th><th>Servicio</th><th>Monto</th><th>Estado</th></tr></thead>
+          <tbody><tr><td>#FT1028</td><td>02/10/2026</td><td>Agente 01</td><td>MonCash</td><td>$75.000</td><td><span class="status ok">Completada</span></td></tr></tbody></table>
+        </div>
+      </section>
+
+      <section id="balances" class="section hidden">
+        <div class="cards">
+          <div class="card"><span>Saldo disponible</span><strong>$8.450.000</strong></div>
+          <div class="card"><span>Saldo agentes</span><strong>$5.230.000</strong></div>
+          <div class="card"><span>Movimientos pendientes</span><strong>12</strong></div>
+        </div>
+        <div class="panel"><h3>Control de saldos</h3><p class="muted">Módulo preparado para integrar movimientos, cargas y retiros.</p></div>
+      </section>
+
+      <section id="commissions" class="section hidden">
+        <div class="cards">
+          <div class="card"><span>Comisiones del mes</span><strong>$425.800</strong></div>
+          <div class="card"><span>Pagadas</span><strong>$310.000</strong></div>
+          <div class="card"><span>Pendientes</span><strong>$115.800</strong></div>
+        </div>
+        <div class="panel"><h3>Resumen de comisiones</h3><p class="muted">Configuración de porcentajes por servicio y agente.</p></div>
+      </section>
+
+      <section id="settings" class="section hidden">
+        <div class="panel settings">
+          <h3>Configuración</h3>
+          <label>Nombre de empresa<input value="Frantz TopUp SPA"></label>
+          <label>Dominio<input value="www.frantztopup.cl"></label>
+          <label>WhatsApp de atención<input placeholder="+56 ..."></label>
+          <label>Moneda principal<select><option>CLP - Peso chileno</option><option>USD - Dólar</option></select></label>
+          <button>Guardar cambios</button>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
