@@ -5,3 +5,5 @@ Thumbs.db
 .netlify/
 node_modules/
 npm-debug.log*
+*.zip
+*.log
