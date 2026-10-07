@@ -336,7 +336,7 @@ pix:{n:"Pix Brasil",c:"#1fa99a",g:"P",cur:"BRL",fx:5.4,cm:2,f:["name","phone","a
 var BK={sogebank:{n:"Sogebank",c:"#0b5ea8",g:"S"},unibank:{n:"Unibank",c:"#00843d",g:"U"},capital:{n:"Capital Bank",c:"#b01c2e",g:"C"},rut:{n:"Cuenta RUT",c:"#ff6a13",g:"R",bank:"BancoEstado"},mx:{n:"México",c:"#006847",g:"MX",bank:"México"}};
 var OP=["Digicel","Natcom","Claro","Movistar","Tigo","Entel","Bitel","Vivo","TIM","Orange"];
 var ct="ht",FL={ht:"🇭🇹",mx:"🇲🇽",cl:"🇨🇱"};
-var ORD=["topup","moncash","natcash","zelle","nequi","yape","pix","depo"],SUB={topup:"s_top",moncash:"s_wal",natcash:"s_wal"},LCL=["fr","es","fr","en","zh","pt"],PT={home:"inicio",deu:"deuT",not:"ntT",send:"envio",fac:"facT",ops:"ops",mov:"mov",net:"redn",ag:"pag",prof:"perfil",sup:"soporte",users:"usrT",sec:"segur"};
+var ORD=["topup","moncash","natcash","zelle","nequi","yape","pix","depo"],SUB={topup:"s_top",moncash:"s_wal",natcash:"s_wal"},LCL=["fr","es","fr","en","zh","pt"],PT={home:"inicio",deu:"deuT",not:"ntT",send:"envio",fac:"facT",ops:"ops",mov:"mov",net:"redn",ag:"pag",prof:"perfil",sup:"soporte",users:"usrT",sec:"segur",reset:"pwcam"};
 var IM={};Object.keys(LOGO).forEach(function(k){var i=new Image();i.src=LOGO[k];IM[k]=i});
 function accOf(v){if(v=="a"||v=="v")return null;var p=v.split(":"),m=masters.filter(function(x){return x.id==p[1]})[0];if(!m)return null;if(p[0]=="m")return m;return m.ags.filter(function(g){return g.id==p[2]})[0]||null}
 function bal(){var a=accOf(srcv);return a?a.saldo:virt}
@@ -394,6 +394,8 @@ clista:["Kont ki anrejistre","Cuentas registradas","Comptes enregistrés","Regis
 ssinus:["Poko pa gen kont travayè.","Aún no hay cuentas de trabajadores.","Aucun compte travailleur pour l'instant.","No worker accounts yet.","暂无工作人员账户。","Ainda não há contas de trabalhadores."],
 creok:["Kont kreye kòrèk.","Cuenta creada correctamente.","Compte créé avec succès.","Account created successfully.","账户创建成功。","Conta criada com sucesso."],
 rpass:["Reinis modpas","Restablecer contraseña","Réinitialiser le mot de passe","Reset password","重置密码","Redefinir senha"],
+forgotpw:["Bli modpas ou?","¿Olvidaste tu contraseña?","Mot de passe oublié ?","Forgot password?","忘记密码？","Esqueceu a senha?"],
+recovmail:["Nouvo modpas la voye pa imèl.","Te enviamos un correo para restablecer tu contraseña.","Un e-mail de réinitialisation vous a été envoyé.","Recovery email sent.","已发送重置密码邮件.","E-mail de recuperação enviado."],
 rolu:["Ròl","Rol","Rôle","Role","角色","Função"],
 rolad:["Administratè","Administrador","Administrateur","Administrator","管理员","Administrador"],
 roltr:["Travayè","Trabajador","Travailleur","Worker","工作人员","Trabalhador"],
@@ -591,6 +593,7 @@ var quick='<div class="row" style="flex-wrap:wrap;gap:8px">'+["depo","nequi","pi
 return'<div class="box" style="text-align:center;padding:18px 14px"><div style="font-size:20px;font-weight:800">'+t("hola")+', '+esc(greetName())+'</div><div class="mut" style="font-size:13px;margin-top:4px">'+esc(dtu)+'</div><div class="row" style="justify-content:center;gap:8px;margin-top:12px"><span class="actb">✓ '+t("act")+'</span><span class="mut" style="font-size:12px">'+esc(myCode())+' · '+rolName()+'</span></div></div>'
 +'<div class="box cc"><div class="mut" style="letter-spacing:.12em;font-size:12px;font-weight:600">'+t("cuen").toUpperCase()+'</div><div style="font-size:20px;font-weight:800;margin:4px 0 10px">'+esc(biz)+'</div><div class="bal '+ct+'"><div style="display:flex;justify-content:space-between"><div><span class="bl">'+ic("wallet",18)+' '+t("salg").toUpperCase()+'</span><div class="bn">'+nf(virt)+' CLP</div></div></div><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-top:20px"><span class="bl" style="letter-spacing:0;font-size:11px">'+t("forn")+'</span><button class="vm" onclick="go(\'mov\')">'+t("vmov")+'</button></div></div></div>'
 +'<div class="box"><div class="ch" style="border:0;padding:0 0 8px"><h2 style="margin:0;font-size:17px">'+t("envio")+'</h2><button class="vm2" onclick="go(\'send\')">'+t("all")+'</button></div>'+quick+'</div>'
++'<div class="box"><div class="ch" style="border:0;padding:0 0 8px"><h2 style="margin:0;font-size:17px">'+t(redKey())+'</h2><button class="vm2" onclick="go(\'net\')">'+t("all")+'</button></div><div class="row" style="flex-wrap:wrap;gap:8px"><button class="tile" style="flex:1;min-width:140px" onclick="go(\'net\')"><span style="color:var(--blue)">'+ic("net",34)+'</span><span style="font-size:12px">'+t(redKey())+'</span></button></div></div>'
 +'<div class="box" style="position:relative;border-radius:20px"><div class="mut" style="letter-spacing:.12em;font-size:12px;font-weight:600">'+t("opt").toUpperCase()+'</div><div style="font-size:30px;font-weight:800;margin:12px 0 4px">'+nf(tot)+' CLP</div><div class="mut">'+hoy.length+' '+t("incl")+'</div><div class="stats" style="grid-template-columns:repeat(3,1fr);margin:12px 0 0">'+st(t("pnd"),pc)+st(t("cfd"),cc)+st(t("rjd"),rc)+'</div><span class="trend">'+ic("trend",22)+'</span></div>'
 +'<div class="ch" style="border:0;padding:0 0 10px"><h2 style="font-size:20px;margin:0;font-weight:800">'+t("svs")+'</h2><button class="vm2" onclick="go(\'send\')">'+t("all")+'</button></div>'+srv
 +'<div class="box"><div class="ch" style="border:0;padding:0 0 8px"><h2 style="margin:0;font-size:17px">'+t("act_re")+'</h2><button class="vm2" onclick="go(\'ops\')">'+t("all")+'</button></div>'+(ops.length?ops.slice(0,6).map(rec).join(""):'<div class="empty">'+t("empty")+'</div>')+'</div>'}
@@ -639,7 +642,7 @@ var inp=function(id,cap){return'<input id="'+id+pre+'" type="file" accept="image
 return'<div style="text-align:center">'+ph+'<div class="row" style="justify-content:center;gap:8px;margin-top:10px"><button class="b neu" style="margin:0" onclick="document.getElementById(\'pc'+pre+'\').click()">'+t("foto")+'</button><button class="b neu" style="margin:0" onclick="document.getElementById(\'pt'+pre+'\').click()">'+t("tkf")+'</button>'+inp("pc",0)+inp("pt",1)+'</div>'+(pic?'<button class="b no" style="margin:8px 0 0" onclick="fd[\''+pre+'i\']=\'\';draw()">'+t("del")+'</button>':'')+'<div class="mut" style="font-size:12px;margin:8px 0">'+t("pichint")+'</div></div>'}
 function acAv(a,sz){return a.pic?'<img class="av" style="width:'+sz+'px;height:'+sz+'px;flex:none" src="'+a.pic+'" alt="">':'<span class="lb" style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;font-weight:800;font-size:'+Math.round(sz*.4)+'px">'+esc(String(a.fn||a.user||"?").charAt(0).toUpperCase())+'</span>'}
 function acHd(a,sz,role,ref){return'<div class="hd">'+acAv(a,sz)+'<div style="flex:1;min-width:0"><b>'+esc(a.fn||a.user)+'</b><br><span class="mut" style="font-size:12px">'+esc(a.code||"")+' · '+role+' · @'+esc(a.user)+'</span></div><button class="b neu" style="margin:0;padding:6px 10px;font-size:12px" onclick="peOpen(\''+ref+'\')">'+t("edp")+'</button></div><div class="mut" style="font-size:12px;margin-top:6px">'+esc(a.phone)+' · '+esc(a.email)+(a.k?' · '+cfl(a):'')+'</div>'}
-function peOpen(ref){var a=accOf(ref);if(!a)return;go("net");peRef=ref;fd.pen=a.fn||"";fd.pep=a.phone||"";fd.pee=a.email||"";fd.pei=a.pic||"";draw();try{if(window.scrollTo)window.scrollTo(0,0)}catch(e){}}
+function peOpen(ref){var a=accOf(ref);if(!a)return;go('net');peRef=ref;fd.pen=a.fn||"";fd.pep=a.phone||"";fd.pee=a.email||"";fd.pei=a.pic||"";draw();try{if(window.scrollTo)window.scrollTo(0,0)}catch(e){}}
 function peBox(){if(!peRef)return"";var a=accOf(peRef);if(!a)return"";return'<div class="box" style="border:2px solid #1d4fd7">'+picUI("pe",fd.pei,fd.pen||a.user)+'<div style="text-align:center;margin:6px 0 4px"><b style="font-size:18px">'+esc(fd.pen||a.user)+'</b><br><span class="mut">'+esc(a.code||"")+' · '+t(peRef.charAt(0)=="m"?"rolem":"rolea")+'</span></div><label>'+t("fnm")+'</label><input type="text" value="'+esc(fd.pen||"")+'" oninput="fd.pen=this.value"><label>'+t("phone")+'</label><input type="tel" value="'+esc(fd.pep||"")+'" oninput="fd.pep=this.value"><label>'+t("mail")+'</label><input type="email" value="'+esc(fd.pee||"")+'" oninput="fd.pee=this.value"><div class="row" style="margin-top:12px"><button class="b" style="margin:0" onclick="peSave()">'+t("savec")+'</button><button class="b neu" style="margin:0" onclick="peRef=\'\';draw()">'+t("back")+'</button></div></div>'}
 function peSave(){var a=accOf(peRef);if(!a)return;var p=String(fd.pep||"").trim(),e=String(fd.pee||"").trim(),q=p.replace(/\D/g,"");if(q.length<7||q.length>15){msg=t("e_phone");draw();return}if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e)){msg=t("e_mail");draw();return}a.fn=String(fd.pen||"").trim();a.phone=p;a.email=e;a.pic=fd.pei||"";persist();peRef="";msg="";draw()}
 async function mkA(mid){var pre=mid||"root",g=function(k){return fd[pre+k]||""},u=g("u").trim(),k=fd[pre+"k"]||(mid&&mf(mid)&&mf(mid).k)||ccDef,dl=dialOf(k),p=normPh(g("p").trim(),dl),e=g("e").trim(),w=g("w"),c=g("c"),er=accErr(u,p,e,w,c,dl);
@@ -761,6 +764,19 @@ return'<div class="box"><h2>'+t("nuoc")+'</h2>'
 +'<label>'+t("rolu")+'</label><select id="nrl">'+rolOpts("trabajador")+'</select>'
 +'<button class="b neu" style="width:100%" onclick="crearCuenta()">'+t("creoc")+'</button></div>'
 +'<div class="box"><h2>'+t("clista")+'</h2>'+(lista||'<p class="mut">'+t("ssinus")+'</p>')+'</div>'}
+async function forgot(){
+  if(!sb){msg="No se pudo conectar con Supabase.";draw();return}
+  var em=document.getElementById("lem"),e=em?em.value.trim():"";
+  if(!e){msg=t("ncam");draw();return}
+  msg=t("load");draw();
+  try{
+    var base=location.origin+location.pathname;
+    var {error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:base});
+    if(error){msg=fErr(error);draw();return}
+    msg=t("recovmail");
+  }catch(err){msg=fErr(err)}
+  draw()
+}
 async function out(){dr=false;msg="";if(sb)try{await sb.auth.signOut()}catch(e){}sesion=null;esAdmin=false;tab="home";draw()}
 async function unl(){if(!sb){msg="No se pudo conectar con Supabase. Revisá la conexión a internet.";draw();return}
 var em=document.getElementById("lem"),pw=document.getElementById("lp");
@@ -776,18 +792,37 @@ return'<div class="box" style="max-width:400px"><h2>'+t("padm")+'</h2>'
 +'<label>'+t("correo")+'</label><input id="lem" type="email" autocomplete="username" placeholder="correo@ejemplo.com" onkeydown="if(event.key==\'Enter\')unl()">'
 +'<label>'+t("pw")+'</label><input id="lp" type="password" autocomplete="current-password" onkeydown="if(event.key==\'Enter\')unl()">'
 +'<button class="b neu" style="width:100%" onclick="unl()">'+t("enter")+'</button>'
++'<div style="display:flex;justify-content:center;margin:12px 0 0"><button class="b neu" style="margin:0;padding:6px 10px;font-size:12px" onclick="forgot()">'+t("forgotpw")+'</button></div>'
 +'<p class="mut" style="font-size:12px;margin:12px 0 0">'+t("noacct")+'</p></div>'}
 function drawer(){var it=function(k,l){if(!allow(k))return"";return'<button class="it'+(tab==k?" on":"")+'" onclick="go(\''+k+'\')">'+ic(k,22)+t(l)+'</button>'};
 return'<div class="ov" onclick="dr=false;draw()"></div><aside class="dr" aria-label="Menu">'+(sesion&&myRol!="admin"?'<div style="display:flex;align-items:center;gap:12px;padding:14px 12px;border-bottom:1px solid var(--line);margin-bottom:6px">'+(pfPhoto?'<img class="av" style="width:46px;height:46px;flex:none" src="'+pfPhoto+'" alt="">':'<span class="lb" style="width:46px;height:46px;border-radius:50%;font-weight:800;font-size:20px;flex:none">'+esc(String(greetName()).charAt(0).toUpperCase())+'</span>')+'<div style="flex:1;min-width:0"><b style="font-size:15px">'+esc(greetName())+'</b><br><span class="mut" style="font-size:12px">'+esc(myCode())+' · '+rolName()+'</span></div></div>':'')+it("home","inicio")+it("not","ntT")+it("send","envio")+it("fac","facT")+it("ops","ops")+it("mov","mov")+it("net",redKey())+it("deu","deuT")+it("ag","pag")+it("prof","perfil")+it("sup","soporte")+it("users","usrT")+it("sec","segur")+'<div style="flex:1"></div><button class="it" style="border-top:1px solid var(--line);border-radius:0;color:var(--mut)" onclick="out()">'+ic("out",22)+t("out")+'</button></aside>'}
 function mbc(){if(!lock&&tab=="send"&&sel){if(sel=="depo"&&bk)bk="";else{sel="";d={}}draw()}else{dr=!dr;draw()}}
 function tg(){var r=document.documentElement,dk=r.dataset.theme?r.dataset.theme=="dark":matchMedia("(prefers-color-scheme: dark)").matches;r.dataset.theme=dk?"light":"dark";persist()}
+function vReset(){
+  if(!sesion)return '<div class="box"><h2>'+t("pwcam")+'</h2></div>';
+  return '<div class="box" style="max-width:400px"><h2>'+t("pwcam")+'</h2>'
+  +'<label>'+t("pw")+' (min. 6)</label><input id="rnp" type="password" autocomplete="new-password">'
+  +'<label>'+t("pw2")+'</label><input id="rcp" type="password" autocomplete="new-password">'
+  +'<button class="b neu" style="width:100%" onclick="doReset()">'+t("savec")+'</button></div>';
+}
+async function doReset(){
+  if(!sb||!sesion){msg="";draw();return}
+  var np=document.getElementById("rnp"),cp=document.getElementById("rcp");
+  var n=np?np.value:"",c=cp?cp.value:"";
+  if(!n||!c){msg=t("ncam");draw();return}
+  if(n.length<6){msg=t("npmin");draw();return}
+  if(n!==c){msg=t("e_cf");draw();return}
+  msg=t("load");draw();
+  try{var r=await sb.auth.updateUser({password:n});if(r.error){msg=fErr(r.error);draw();return}msg=t("pass_ok");tab="home";await out()}catch(err){msg=fErr(err)}
+  draw()
+}
 function draw(){lock=!sesion;if(sesion&&!allow(tab)){msg=t("denied");tab="home"}var sv0=!lock&&tab=="send"&&sel,nm=sel=="depo"&&bk?BK[bk].n:sel?SV[sel].n:"",pc=ops.filter(function(o){return o.st=="p"}).length;
 document.getElementById("ttl").textContent=lock?t("padm"):tab=="home"?panelName():sv0?nm:(tab=="net"?t(redKey()):t(PT[tab]));
 document.getElementById("sbt").textContent=lock?"":tab=="home"?(myRol=="master"?t("salg"):t("resop")):sv0?t("envio"):biz;
 var mb=document.getElementById("mb");mb.style.display=lock?"none":"";mb.innerHTML=ic(sv0?"back":"menu",26);
 document.getElementById("hr").innerHTML=lock?"":'<button class="ib" aria-label="Theme" onclick="tg()">'+ic("moon",24)+'</button><button class="ib" aria-label="Notifications" onclick="go(\'not\')">'+ic("bell",24)+(ntUnread()?'<span class="bg">'+(ntUnread()>9?"9+":ntUnread())+'</span>':'')+'</button><img class="av" src="'+(pfPhoto||LOGO.av)+'" alt="">';
 document.getElementById("dw").innerHTML=dr&&!lock?drawer():"";
-var pg={home:(myRol=="master"?vHomeM:vHome),deu:vDeu,not:vNot,send:vOps,fac:vFac,ops:vHist,mov:(myRol=="master"?vMovM:vMov),net:vRed,ag:vAg,prof:vProf,sup:vSup,users:vUsers,sec:vSec};
+var pg={home:(myRol=="master"?vHomeM:vHome),deu:vDeu,not:vNot,send:vOps,fac:vFac,ops:vHist,mov:(myRol=="master"?vMovM:vMov),net:vRed,ag:vAg,prof:vProf,sup:vSup,users:vUsers,sec:vSec,reset:vReset};
 document.getElementById("main").innerHTML=lock?lockHtml():(msg?'<div class="box" role="status"><b>'+esc(msg)+'</b></div>':"")+(pend?'<div class="box" role="alertdialog" style="border:2px solid #1d4fd7"><b>'+esc(pend.txt)+'</b><div class="row" style="margin-top:10px"><button class="b" style="margin:0;background:#1f9d55" onclick="pendOk()">'+t("conf")+'</button><button class="b neu" style="margin:0" onclick="pendNo()">'+t("back")+'</button></div></div>':"")+pvHtml()+pg[tab]();eq();dtc();persist()}
 var SK="fpanel_v1",lastSave="";
 function snap(){return JSON.stringify({virt:virt,L:L,ops:ops,log:log,cnt:cnt,mvn:mvn,rt:rt,cr:cr,biz:biz,supNum:supNum,waMode:waMode,krDef:krDef,inv:inv,nts:nts,ct:ct,masters:masters,pfPhoto:pfPhoto,pfPhone:pfPhone,pfMail:pfMail,tdOn:tdOn,rd:rd,th:document.documentElement.dataset.theme||"",ts:Date.now()})}
@@ -799,7 +834,18 @@ try{if(sb)var s0=await sb.auth.getSession();sesion=(s0&&s0.data.session)||null}c
 if(sesion)await cargarRol();
 try{var a=localStorage.getItem(SK);if(a)apply(JSON.parse(a))}catch(e){}
 lastSave=snapKey();draw();
-if(sb)try{sb.auth.onAuthStateChange(function(ev,s){sesion=s||null;if(sesion){cargarRol().then(function(){draw()})}else{esAdmin=false;draw()}})}catch(e){}
+if(sb)try{sb.auth.onAuthStateChange(function(ev,s){sesion=s||null;if(ev==="PASSWORD_RECOVERY"){tab="reset";draw();return}if(sesion){cargarRol().then(function(){draw()})}else{esAdmin=false;draw()}})}catch(e){}
+setTimeout(async function(){
+  try{
+    if(!sb)return;
+    var codeM=(location.search||"").match(/[?&]code=([^&]+)/);
+    if(codeM){try{await sb.auth.exchangeCodeForSession(decodeURIComponent(codeM[1]))}catch(e){}}
+    if(/(^|[#&?])type=recovery/.test(location.hash+location.search)){
+      var ss=await sb.auth.getSession();
+      if(ss&&ss.data&&ss.data.session){sesion=ss.data.session;tab="reset";await cargarRol();draw()}
+    }
+  }catch(e){}
+},600);
 lastSave="";persist()})();
 </script>
 </body>
