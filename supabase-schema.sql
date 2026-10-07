@@ -9,9 +9,17 @@ create table if not exists public.profiles (
   id         uuid primary key references auth.users(id) on delete cascade,
   email      text not null,
   rol        text not null default 'trabajador'
-             check (rol in ('admin', 'trabajador')),
+             check (rol in ('admin', 'master', 'trabajador')),
   creado_en  timestamptz not null default now()
 );
+
+-- 1b. MIGRACION para bases ya existentes: agrega el rol 'master'
+--     (la constraint vieja solo aceptaba 'admin'/'trabajador').
+--     Pega SOLO este bloque en el SQL Editor la primera vez.
+-- ------------------------------------------------------------
+-- alter table public.profiles drop constraint if exists profiles_rol_check;
+-- alter table public.profiles add constraint profiles_rol_check
+--   check (rol in ('admin', 'master', 'trabajador'));
 
 -- 2. Funcion security definer - evita la recursion infinita de RLS
 --    Si la politica consultara la misma tabla sin esto, Postgres

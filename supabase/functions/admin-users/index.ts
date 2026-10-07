@@ -102,7 +102,9 @@ Deno.serve(async (req: Request) => {
   if (op === "create") {
     const email = String(body.email ?? "").trim().toLowerCase();
     const password = String(body.password ?? "");
-    const rol = body.rol === "admin" ? "admin" : "trabajador";
+    const rol = ["admin", "master"].includes(String(body.rol))
+      ? String(body.rol)
+      : "trabajador";
 
     if (!EMAIL_RE.test(email)) {
       return json({ error: "Correo invalido" }, 400);
