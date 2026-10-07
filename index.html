@@ -85,7 +85,7 @@ header h1{font-size:18px}.htl{flex:1;min-width:0}.htl small{display:block;color:
 var SB_URL="https://qjcwtejemgtdosioebtk.supabase.co";
 var SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqY3d0ZWplbWd0ZG9zaW9lYnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMDQwMjksImV4cCI6MjEwNjg4MDAyOX0.5XjDrMLJ7RVzPfDt8OGzsbRK2m6CufBNHaHZJra6U3k";
 var sb=null;
-try{if(window.supabase&&window.supabase.createClient)sb=window.supabase.createClient(SB_URL,SB_ANON)}catch(e){sb=null}
+try{if(window.supabase&&window.supabase.createClient){var sess=window.sessionStorage||window.localStorage;sb=window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:sess,persistSession:true,autoRefreshToken:true}})}else{sb=null}}catch(e){sb=null}
 var sesion=null,esAdmin=false,myRol="";
 function allow(k){if(k=="users"||k=="deu"||k=="ag")return esAdmin;if(k=="net")return esAdmin||myRol=="master";if(k=="mov")return esAdmin||myRol=="master";if(k=="not"||k=="fac")return myRol!="master";return true}
 function redKey(){return myRol=="master"?"mired":"redn"}
