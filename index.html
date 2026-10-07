@@ -89,6 +89,7 @@ try{if(window.supabase&&window.supabase.createClient)sb=window.supabase.createCl
 var sesion=null,esAdmin=false,myRol="";
 function allow(k){if(k=="users"||k=="deu"||k=="ag")return esAdmin;if(k=="net")return esAdmin||myRol=="master";if(k=="mov")return esAdmin||myRol=="master";if(k=="not"||k=="fac")return myRol!="master";return true}
 function redKey(){return myRol=="master"?"mired":"redn"}
+function panelName(){return esAdmin?t("padm"):myRol=="master"?t("pmas"):t("ptrb")}
 function rolName(){return myRol=="admin"?t("rolad"):myRol=="master"?t("rolmas"):t("roltr")}
 function rolOpts(sel){return[["admin","rolad"],["master","rolmas"],["trabajador","roltr"]].map(function(o){return'<option value="'+o[0]+'"'+(sel==o[0]?" selected":"")+'>'+t(o[1])+'</option>'}).join("")}
 function myCode(){var s=String((sesion&&(sesion.user.id||sesion.user.email))||"");var h=0;for(var i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0}return"ST-AG-"+("000000"+h.toString(16).toUpperCase()).slice(-6)}
@@ -404,6 +405,8 @@ e_same:["Nouvo modpas la dwe diferan ak aktyèl la.","La nueva contraseña debe 
 pwpriv:["Ou ka chanje modpas ou nan Pwofil mwen.","Puedes cambiar tu contraseña desde Mi perfil.","Vous pouvez changer votre mot de passe depuis Mon profil.","You can change your password from My profile.","你可以在“我的个人资料”中更改密码。","Pode alterar a sua palavra-passe no Meu perfil."],
 rolmas:["Mèt Ajans","Máster Agencia","Maître Agence","Master Agency","总代理","Agência Master"],
 mired:["Rezo mwen","Mis agencias","Mes agences","My agencies","我的网点","As minhas agências"],
+pmas:["Panel Mèt Ajans","Panel Master agencia","Panneau Master agence","Master agency panel","总代理面板","Painel Master agência"],
+ptrb:["Panel Travayè","Panel de trabajador","Panneau travailleur","Worker panel","员工面板","Painel do trabalhador"],
 salg:["Balans jeneral","Saldo general","Solde général","General balance","总余额","Saldo geral"],
 act_re:["Aktivite resan","Actividad reciente","Activité récente","Recent activity","最近活动","Atividade recente"]});
 function t(k,l){return I[k][l==null?L:l]}
@@ -582,7 +585,7 @@ return vcard(true)+'<div class="box" style="position:relative;border-radius:20px
 function vHomeM(){var td=pdate(),hoy=ops.filter(function(o){return o.date.slice(0,10)==td}),tot=hoy.reduce(function(s,o){return s+o.tot},0),pc=hoy.filter(function(o){return o.st=="p"}).length,cc=hoy.filter(function(o){return o.st=="c"}).length,rc=hoy.filter(function(o){return o.st=="r"}).length;
 var dtu=(function(){var d=new Date().toLocaleString(LCL[L],{weekday:"long",day:"numeric",month:"long",year:"numeric"});return d.charAt(0).toUpperCase()+d.slice(1)})();
 var srv='<div class="grid" style="grid-template-columns:1fr;gap:10px">'+["topup","moncash","natcash"].map(function(k){var S=SV[k];return'<button class="svc" style="gap:14px;padding:12px 14px" onclick="pick(\''+k+'\')"><span class="lb" style="width:48px;height:48px;border-radius:16px;flex:none">'+lg(k,44)+'</span><span style="flex:1;text-align:left"><b style="font-size:16px;display:block">'+S.n+'</b><span class="'+(SUB[k]?"gr":"mut")+'" style="font-size:13px">'+t(SUB[k])+'</span></span><span class="chev">›</span></button>'}).join("")+'</div>';
-var quick='<div class="row" style="flex-wrap:wrap;gap:8px">'+["depo","nequi","pix","zelle"].map(function(k){return'<button class="tile" style="flex:1;min-width:118px" onclick="pick(\''+k+'\')"><span class="lb" style="width:40px;height:40px;border-radius:14px;margin:0">'+lg(k,34)+'</span><span style="font-size:12px">'+(k=="depo"?t("dpo"):SV[k].n)+'</span></button>'}).join("")+'</div>';
+var quick='<div class="row" style="flex-wrap:wrap;gap:8px">'+["depo","nequi","pix","zelle"].map(function(k){return'<button class="tile" style="flex:1;min-width:118px" onclick="pick(\''+k+'\')"><span class="lb" style="width:40px;height:40px;border-radius:14px;margin:0">'+lg(k,34)+'</span><span style="font-size:12px">'+(k=="depo"?t("dpo"):SV[k].n)+'</span></button>'}).join("")+'<button class="tile" style="flex:1;min-width:118px" onclick="go(\'net\')"><span style="color:var(--blue)">'+ic("net",34)+'</span><span style="font-size:12px">'+t(redKey())+'</span></button></div>';
 return'<div class="box" style="text-align:center;padding:18px 14px"><div style="font-size:20px;font-weight:800">'+t("hola")+', '+esc(greetName())+'</div><div class="mut" style="font-size:13px;margin-top:4px">'+esc(dtu)+'</div><div class="row" style="justify-content:center;gap:8px;margin-top:12px"><span class="actb">✓ '+t("act")+'</span><span class="mut" style="font-size:12px">'+esc(myCode())+' · '+rolName()+'</span></div></div>'
 +'<div class="box cc"><div class="mut" style="letter-spacing:.12em;font-size:12px;font-weight:600">'+t("cuen").toUpperCase()+'</div><div style="font-size:20px;font-weight:800;margin:4px 0 10px">'+esc(biz)+'</div><div class="bal '+ct+'"><div style="display:flex;justify-content:space-between"><div><span class="bl">'+ic("wallet",18)+' '+t("salg").toUpperCase()+'</span><div class="bn">'+nf(virt)+' CLP</div></div></div><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-top:20px"><span class="bl" style="letter-spacing:0;font-size:11px">'+t("forn")+'</span><button class="vm" onclick="go(\'mov\')">'+t("vmov")+'</button></div></div></div>'
 +'<div class="box"><div class="ch" style="border:0;padding:0 0 8px"><h2 style="margin:0;font-size:17px">'+t("envio")+'</h2><button class="vm2" onclick="go(\'send\')">'+t("all")+'</button></div>'+quick+'</div>'
@@ -777,7 +780,7 @@ return'<div class="ov" onclick="dr=false;draw()"></div><aside class="dr" aria-la
 function mbc(){if(!lock&&tab=="send"&&sel){if(sel=="depo"&&bk)bk="";else{sel="";d={}}draw()}else{dr=!dr;draw()}}
 function tg(){var r=document.documentElement,dk=r.dataset.theme?r.dataset.theme=="dark":matchMedia("(prefers-color-scheme: dark)").matches;r.dataset.theme=dk?"light":"dark";persist()}
 function draw(){lock=!sesion;if(sesion&&!allow(tab)){msg=t("denied");tab="home"}var sv0=!lock&&tab=="send"&&sel,nm=sel=="depo"&&bk?BK[bk].n:sel?SV[sel].n:"",pc=ops.filter(function(o){return o.st=="p"}).length;
-document.getElementById("ttl").textContent=lock?t("padm"):tab=="home"?(myRol=="master"?t("rolmas"):t("padm")):sv0?nm:(tab=="net"?t(redKey()):t(PT[tab]));
+document.getElementById("ttl").textContent=lock?t("padm"):tab=="home"?panelName():sv0?nm:(tab=="net"?t(redKey()):t(PT[tab]));
 document.getElementById("sbt").textContent=lock?"":tab=="home"?(myRol=="master"?t("salg"):t("resop")):sv0?t("envio"):biz;
 var mb=document.getElementById("mb");mb.style.display=lock?"none":"";mb.innerHTML=ic(sv0?"back":"menu",26);
 document.getElementById("hr").innerHTML=lock?"":'<button class="ib" aria-label="Theme" onclick="tg()">'+ic("moon",24)+'</button><button class="ib" aria-label="Notifications" onclick="go(\'not\')">'+ic("bell",24)+(ntUnread()?'<span class="bg">'+(ntUnread()>9?"9+":ntUnread())+'</span>':'')+'</button><img class="av" src="'+(pfPhoto||LOGO.av)+'" alt="">';
