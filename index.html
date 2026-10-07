@@ -391,7 +391,12 @@ rolad:["Administratè","Administrador","Administrateur","Administrator","管理�
 roltr:["Travayè","Trabajador","Travailleur","Worker","工作人员","Trabalhador"],
 fncno:["Fonksyon sèvè a poko deploye. Kreye supabase/functions/admin-users.","La función del servidor aún no está desplegada. Creá supabase/functions/admin-users.","La fonction serveur n'est pas encore déployée. Créez supabase/functions/admin-users.","Server function not deployed yet. Create supabase/functions/admin-users.","服务器函数尚未部署。请创建 supabase/functions/admin-users。","Função do servidor ainda não implantada. Crie supabase/functions/admin-users."],
 fncerr:["Erè sèvè: ","Error del servidor: ","Erreur du serveur: ","Server error: ","服务器错误：","Erro do servidor: "],
-cfmail:[". Lo nouvo itilizatè dwe konfime l imèl li anvan li ka antre.",". El nuevo usuario debe confirmar su correo antes de poder iniciar sesión.",". Le nouvel utilisateur doit confirmer son e-mail avant de pouvoir se connecter.",". The new user must confirm their email before signing in.",". 新用户必须先确认电子邮件才能登录。.",". O novo utilizador tem de confirmar o e-mail antes de poder iniciar sessão."]});
+cfmail:[". Lo nouvo itilizatè dwe konfime l imèl li anvan li ka antre.",". El nuevo usuario debe confirmar su correo antes de poder iniciar sesión.",". Le nouvel utilisateur doit confirmer son e-mail avant de pouvoir se connecter.",". The new user must confirm their email before signing in.",". 新用户必须先确认电子邮件才能登录。.",". O novo utilizador tem de confirmar o e-mail antes de poder iniciar sessão."],
+pwcam:["Chanje modpas","Cambiar contraseña","Changer le mot de passe","Change password","更改密码","Alterar senha"],
+pwcur:["Modpas aktyèl","Contraseña actual","Mot de passe actuel","Current password","当前密码","Senha atual"],
+e_apass:["Modpas aktyèl la pa kòrèk.","La contraseña actual es incorrecta.","Le mot de passe actuel est incorrect.","Current password is incorrect.","当前密码不正确。","A senha atual está incorreta."],
+e_same:["Nouvo modpas la dwe diferan ak aktyèl la.","La nueva contraseña debe ser distinta de la actual.","Le nouveau mot de passe doit être différent de l'actuel.","New password must be different from the current one.","新密码必须与当前密码不同。","A nova senha deve ser diferente da atual."],
+pwpriv:["Ou ka chanje modpas ou nan Pwofil mwen.","Puedes cambiar tu contraseña desde Mi perfil.","Vous pouvez changer votre mot de passe depuis Mon profil.","You can change your password from My profile.","你可以在“我的个人资料”中更改密码。","Pode alterar a sua palavra-passe no Meu perfil."]});
 function t(k,l){return I[k][l==null?L:l]}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function nf(n){return Number(n).toLocaleString("en-US",{maximumFractionDigits:2})}
@@ -636,7 +641,12 @@ function vProf(){return'<div class="box"><h2>'+t("perfil")+'</h2><div class="hd"
 '<div class="ch"><span>1 CLP =</span><span class="row" style="width:55%"><input type="number" step="any" aria-label="1 CLP = HTG" value="'+(+(1/(cr.HTG||1)).toFixed(4))+'" onchange="var x=parseFloat(this.value);if(x>0){cr.HTG=1/x;rd=tdy()}draw()"><b>HTG</b></span></div>'+
 Object.keys(cr).map(function(c){return'<div class="ch"><span>1 '+c+' =</span><span class="row" style="width:55%"><input type="number" step="any" aria-label="1 '+c+' = CLP" value="'+cr[c]+'" onchange="cr[\''+c+'\']=parseFloat(this.value)||0;rd=tdy();draw()"><b>CLP</b></span></div>'}).join("")+
 '<h2 style="margin:14px 0 4px;font-size:15px">'+t("comm")+' / '+t("ben")+'</h2>'+Object.keys(SV).map(function(k){return'<div class="ch"><span class="row">'+lg(k,28)+SV[k].n+'</span><span class="row" style="width:50%"><input type="number" step="any" aria-label="'+t("comm")+'" value="'+rt[k].cm+'" onchange="rt[\''+k+'\'].cm=parseFloat(this.value)||0"><input type="number" step="any" aria-label="'+t("ben")+'" value="'+rt[k].bn+'" onchange="rt[\''+k+'\'].bn=parseFloat(this.value)||0"></span></div>'}).join("")+
-'<button class="b neu" onclick="rd=tdy();draw()">'+t("upd")+'</button></div>'}
+'<button class="b neu" onclick="rd=tdy();draw()">'+t("upd")+'</button></div>'
++'<div class="box"><h2>'+t("pwcam")+'</h2>'
++'<label>'+t("pwcur")+'</label><input id="cpd" type="password" autocomplete="current-password">'
++'<label>'+t("pw")+' (min. 6)</label><input id="np" type="password" autocomplete="new-password" placeholder="'+t("pw")+' (min. 6)">'
++'<label>'+t("pw2")+'</label><input id="cp" type="password" autocomplete="new-password">'
++'<button class="b neu" style="width:100%" onclick="cambiarPass()">'+t("pwcam")+'</button></div>'}
 function waNum(){return String(supNum||"").replace(/\D/g,"")}
 function waMsg(o){var a=o.src&&o.src!="a"?srcName(o.src):"";return"*"+biz+"*\n"+refNo(o,"c")+" · "+dtxt(o)+(a?"\n👤 "+a:"")+"\n\n"+rowsOf(o,L).map(function(p){return p[0]+": "+p[1]}).join("\n")}
 function waSend(id){var o=typeof id=="object"?id:find(id),n=waNum();if(!o||!n){msg=t("err1");draw();return}var w=window.open("https://wa.me/"+n+"?text="+encodeURIComponent(waMsg(o)),"_blank");if(!w){msg=t("nodl");draw()}}
@@ -651,22 +661,24 @@ var res="";if(facGo){var l=facFind(facQ);res=l.length?l.map(function(o){return'<
 return tb+'<div class="box"><h2>'+t("fsr")+'</h2><input id="fq" type="text" autocomplete="off" placeholder="'+esc(t("fph"))+'" value="'+esc(facQ)+'" onkeydown="if(event.key==\'Enter\')facSearch()"><button class="b" style="width:100%;display:flex;gap:10px;align-items:center;justify-content:center" onclick="facSearch()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>'+t("fsr")+'</button></div>'+res}
 function vSup(){return'<div class="box"><h2>WhatsApp Business</h2><input type="tel" placeholder="+56 9 1234 5678" value="'+esc(supNum)+'" oninput="supNum=this.value;persist()"><button class="b" style="background:#25a244" onclick="supGo()">'+t("open")+'</button></div>'}
 async function cambiarPass(){if(!sb){msg="No se pudo conectar con Supabase.";draw();return}
-var a=document.getElementById("np"),b=document.getElementById("cp");
-var np=a?a.value:"",cp=b?b.value:"";
-if(!np||np.length<6){msg=t("err1");draw();return}
+var a=document.getElementById("cpd"),b=document.getElementById("np"),c=document.getElementById("cp");
+var cur=a?a.value:"",np=b?b.value:"",cp=c?c.value:"";
+if(!cur||!np||!cp){msg=t("ncam");draw();return}
+if(np.length<6){msg=t("npmin");draw();return}
 if(np!==cp){msg=t("e_cf");draw();return}
-if(a)a.value="";if(b)b.value="";
+if(np===cur){msg=t("e_same");draw();return}
 msg=t("load");draw();
+var chk=await sb.auth.signInWithPassword({email:sesion.user.email||"",password:cur});
+if(chk.error){msg=t("e_apass");draw();return}
 var r=await sb.auth.updateUser({password:np});
-msg=r.error?("Error: "+r.error.message):t("pass_ok");draw()}
+if(r.error){msg=t("fncerr")+r.error.message;draw();return}
+if(a)a.value="";if(b)b.value="";if(c)c.value="";
+msg=t("pass_ok");draw()}
 function vSec(){if(!sesion)return'<div class="box"><h2>'+t("segur")+'</h2></div>';
 return'<div class="box"><h2>'+t("segur")+'</h2>'
 +'<div class="ln"><span class="mut">'+t("correo")+'</span><span>'+esc(sesion.user.email)+'</span></div>'
 +'<div class="ln"><span class="mut">'+t("uname")+'</span><span>'+(esAdmin?"Administrador":"Trabajador")+'</span></div>'
-+'<label>'+t("pw")+' ('+t("savec")+')</label>'
-+'<input id="np" type="password" autocomplete="new-password" placeholder="'+t("pw")+' (min. 6)">'
-+'<input id="cp" type="password" autocomplete="new-password" placeholder="'+t("pw2")+'">'
-+'<button class="b neu" onclick="cambiarPass()">'+t("savec")+'</button></div>'}
++'<div class="mut" style="font-size:12px;margin-top:10px">'+t("pwpriv")+'</div></div>'}
 var usu=[],fnOk=null;
 function fnNoDesp(e){var s=(e&&(e.status||(e.context&&e.context.status)))||0;return s===404||(e&&e.message&&/not found|no encontrado/i.test(e.message))}
 function qa(s){return esc(String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'"))}
