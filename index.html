@@ -87,7 +87,7 @@ var SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZi
 var sb=null;
 try{if(window.supabase&&window.supabase.createClient)sb=window.supabase.createClient(SB_URL,SB_ANON)}catch(e){sb=null}
 var sesion=null,esAdmin=false;
-var SOLO_ADMIN={mov:1,net:1,deu:1,ag:1};
+var SOLO_ADMIN={mov:1,net:1,deu:1,ag:1,users:1};
 async function cargarRol(){esAdmin=false;if(!sesion||!sb)return;
 try{var r=await sb.from("profiles").select("rol").eq("id",sesion.user.id).single();
 if(r.data){esAdmin=r.data.rol=="admin"}else{msg=t("noperfil")}}catch(e){esAdmin=false;msg=t("noperfil")}}
@@ -328,7 +328,7 @@ pix:{n:"Pix Brasil",c:"#1fa99a",g:"P",cur:"BRL",fx:5.4,cm:2,f:["name","phone","a
 var BK={sogebank:{n:"Sogebank",c:"#0b5ea8",g:"S"},unibank:{n:"Unibank",c:"#00843d",g:"U"},capital:{n:"Capital Bank",c:"#b01c2e",g:"C"},rut:{n:"Cuenta RUT",c:"#ff6a13",g:"R",bank:"BancoEstado"},mx:{n:"México",c:"#006847",g:"MX",bank:"México"}};
 var OP=["Digicel","Natcom","Claro","Movistar","Tigo","Entel","Bitel","Vivo","TIM","Orange"];
 var ct="ht",FL={ht:"🇭🇹",mx:"🇲🇽",cl:"🇨🇱"};
-var ORD=["topup","moncash","natcash","zelle","nequi","yape","pix","depo"],SUB={topup:"s_top",moncash:"s_wal",natcash:"s_wal"},LCL=["fr","es","fr","en","zh","pt"],PT={home:"inicio",deu:"deuT",not:"ntT",send:"envio",fac:"facT",ops:"ops",mov:"mov",net:"redn",ag:"pag",prof:"perfil",sup:"soporte",sec:"segur"};
+var ORD=["topup","moncash","natcash","zelle","nequi","yape","pix","depo"],SUB={topup:"s_top",moncash:"s_wal",natcash:"s_wal"},LCL=["fr","es","fr","en","zh","pt"],PT={home:"inicio",deu:"deuT",not:"ntT",send:"envio",fac:"facT",ops:"ops",mov:"mov",net:"redn",ag:"pag",prof:"perfil",sup:"soporte",users:"usrT",sec:"segur"};
 var IM={};Object.keys(LOGO).forEach(function(k){var i=new Image();i.src=LOGO[k];IM[k]=i});
 function accOf(v){if(v=="a"||v=="v")return null;var p=v.split(":"),m=masters.filter(function(x){return x.id==p[1]})[0];if(!m)return null;if(p[0]=="m")return m;return m.ags.filter(function(g){return g.id==p[2]})[0]||null}
 function bal(){var a=accOf(srcv);return a?a.saldo:virt}
@@ -370,13 +370,28 @@ var L=0,tab="home",sub="sum",dr=false,nc=false,lock=false,pin="",supNum="+569270
 Object.keys(SV).forEach(function(k){rt[k]={fx:SV[k].fx,cm:SV[k].cm,bn:20}});
 var cr={HTG:7.2,USD:950,COP:0.24,PEN:255,BRL:176,MXN:52};
 Object.assign(I,{
-err_up:["Imèl modpas pa kòrèk.","Correo o contraseña incorrectos.","E-mail ou mot de passe incorrect.","Email or password incorrect.","邮箱或密码不正确.","E-mail ou senha incorreta."],
+err_up:["Imèl modpas pa kòrèk.","Usuario o contraseña incorrectos.","E-mail ou mot de passe incorrect.","Email or password incorrect.","邮箱或密码不正确.","E-mail ou senha incorreta."],
 denied:["Seksyon sa a se pou administratè sèlman.","Sección solo para administradores.","Cette section est réservée aux administrateurs.","This section is for administrators only.","此部分仅限管理员。","Esta seção é apenas para administradores."],
 pass_ok:["Modpas mete ajou.","Contraseña actualizada.","Mot de passe mis à jour.","Password updated.","密码已更新。","Senha atualizada."],
 noacct:["Ou pa gen kont, kontakte administratè a.","Si no tenés cuenta, contactá al administrador.","Si vous n'avez pas de compte, contactez l'administrateur.","If you don't have an account, contact the administrator.","如果您没有账户，请联系管理员。","Se não tem conta, contacte o administrador."],
 load:["Chaje...","Cargando...","Chargement...","Loading...","加载中...","Carregando..."],
 correo:["Imèl","Correo","Courriel","Email","邮箱","E-mail"],
-noperfil:["Kont ou pa gen pwofil. kontakte administratè a.","Tu cuenta no tiene perfil asociado. Contactá al administrador.","Votre compte n'a pas de profil. Contactez l'administrateur.","Your account has no profile. Contact the administrator.","您的账户没有关联档案，请联系管理员。","A sua conta não tem perfil. Contacte o administrador."]});
+noperfil:["Kont ou pa gen pwofil. kontakte administratè a.","Tu cuenta no tiene perfil asociado. Contactá al administrador.","Votre compte n'a pas de profil. Contactez l'administrateur.","Your account has no profile. Contact the administrator.","您的账户没有关联档案，请联系管理员。","A sua conta não tem perfil. Contacte o administrador."],
+ncam:["Rense tout chan yo.","Completa todos los campos.","Remplissez tous les champs.","Fill in all fields.","请填写所有字段。","Preencha todos os campos."],
+npmin:["Modpas la dwe gen omwen 6 karaktè.","La contraseña debe tener al menos 6 caracteres.","Le mot de passe doit contenir au moins 6 caractères.","Password must be at least 6 characters.","密码至少需要 6 个字符。","A senha deve ter pelo menos 6 caracteres."],
+usrT:["Travayè","Trabajadores","Travailleurs","Workers","工作人员","Trabalhadores"],
+nuoc:["Kont nouvo","Nueva cuenta","Nouveau compte","New account","新账户","Nova conta"],
+creoc:["Kreye kont","Crear cuenta","Créer un compte","Create account","创建账户","Criar conta"],
+clista:["Kont ki anrejistre","Cuentas registradas","Comptes enregistrés","Registered accounts","已注册账户","Contas registradas"],
+ssinus:["Poko pa gen kont travayè.","Aún no hay cuentas de trabajadores.","Aucun compte travailleur pour l'instant.","No worker accounts yet.","暂无工作人员账户。","Ainda não há contas de trabalhadores."],
+creok:["Kont kreye kòrèk.","Cuenta creada correctamente.","Compte créé avec succès.","Account created successfully.","账户创建成功。","Conta criada com sucesso."],
+rpass:["Reinis modpas","Restablecer contraseña","Réinitialiser le mot de passe","Reset password","重置密码","Redefinir senha"],
+rolu:["Ròl","Rol","Rôle","Role","角色","Função"],
+rolad:["Administratè","Administrador","Administrateur","Administrator","管理员","Administrador"],
+roltr:["Travayè","Trabajador","Travailleur","Worker","工作人员","Trabalhador"],
+fncno:["Fonksyon sèvè a poko deploye. Kreye supabase/functions/admin-users.","La función del servidor aún no está desplegada. Creá supabase/functions/admin-users.","La fonction serveur n'est pas encore déployée. Créez supabase/functions/admin-users.","Server function not deployed yet. Create supabase/functions/admin-users.","服务器函数尚未部署。请创建 supabase/functions/admin-users。","Função do servidor ainda não implantada. Crie supabase/functions/admin-users."],
+fncerr:["Erè sèvè: ","Error del servidor: ","Erreur du serveur: ","Server error: ","服务器错误：","Erro do servidor: "],
+cfmail:[". Lo nouvo itilizatè dwe konfime l imèl li anvan li ka antre.",". El nuevo usuario debe confirmar su correo antes de poder iniciar sesión.",". Le nouvel utilisateur doit confirmer son e-mail avant de pouvoir se connecter.",". The new user must confirm their email before signing in.",". 新用户必须先确认电子邮件才能登录。.",". O novo utilizador tem de confirmar o e-mail antes de poder iniciar sessão."]});
 function t(k,l){return I[k][l==null?L:l]}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function nf(n){return Number(n).toLocaleString("en-US",{maximumFractionDigits:2})}
@@ -400,7 +415,7 @@ return'<div class="box"><div class="ch" style="border:0;padding:0 0 6px"><h2 sty
 function ask(x,run){pend={txt:x,run:run};draw()}
 function pendOk(){var p=pend;pend=null;if(p)p.run();else draw()}
 function pendNo(){pend=null;draw()}
-function go(k){tab=k;dr=false;msg="";pend=null;if(k=="send"||k=="home"){sel="";bk=""}draw()}
+function go(k){tab=k;dr=false;msg="";pend=null;if(k=="send"||k=="home"){sel="";bk=""}if(k=="users")cargarUsuarios().then(draw);draw()}
 function sb(k){sub=k;msg="";draw()}
 function pick(k){sel=k;bk="";d={};tab="send";msg="";draw()}
 function rate(c){return c=="CLP"?1:(cr[c]||0)}
@@ -541,7 +556,7 @@ return h+'<div class="box"><div class="hd"><span class="lb">'+lg(key,50)+'</span
 '<div class="box"><div class="mut" '+hd+'>'+t("resm").toUpperCase()+'</div><div class="ln" style="margin-top:8px"><span class="mut">'+t("serv")+'</span><b>'+nm+'</b></div><div class="ln"><span class="mut">'+t("msent")+'</span><b id="r1">—</b></div><div class="ln"><span class="mut">'+t("mrecv")+'</span><b id="r2">—</b></div><div class="ln"><span class="mut">'+t("cest")+'</span><b id="r3">0 CLP</b></div><hr style="border:0;border-top:1px solid var(--line)"><div class="ln"><span class="mut">'+t("tded")+'</span><b id="r4">0 CLP</b></div><div class="ln"><span class="mut">'+t("sgen")+'</span>'+sdl(bal())+'</div></div>'+(last?rec(last):"")}
 function num(id){var m=parseFloat(document.getElementById(id).value);if(!(m>0)){msg=t("err1");draw();return 0}return m}
 function kv(){var m=num("v1");if(!m)return;virt+=m;mv("dep","","a",m,t("s1"),"+"+nf(m)+" CLP");msg="";draw()}
-var IC={fac:'<path d="M6 3h12v18l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L6 21z"/><path d="M12 7v10M14.6 9.3c-.6-.5-1.5-.8-2.6-.8-1.4 0-2.4.6-2.4 1.6 0 2.3 5 1 5 3.3 0 1-1 1.7-2.6 1.7-1 0-1.9-.3-2.6-.9"/>',home:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',send:'<path d="M21 3L3 11l7 3 3 7z"/>',ops:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/>',mov:'<path d="M4 8h15l-4-4M20 16H5l4 4"/>',prof:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',sup:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',sec:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',net:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 15c2.5.5 4 2 4 5"/>',out:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',back:'<path d="M19 12H5M12 5l-7 7 7 7"/>',moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/>',bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0"/>',not:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0"/>',deu:'<circle cx="12" cy="12" r="9"/><path d="M12 7v6M9 12l3 3 3-3"/>',wallet:'<path d="M3 7a2 2 0 0 1 2-2h12v4M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2zM16 14h2"/>',trend:'<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>'};
+var IC={users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',fac:'<path d="M6 3h12v18l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L6 21z"/><path d="M12 7v10M14.6 9.3c-.6-.5-1.5-.8-2.6-.8-1.4 0-2.4.6-2.4 1.6 0 2.3 5 1 5 3.3 0 1-1 1.7-2.6 1.7-1 0-1.9-.3-2.6-.9"/>',home:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',send:'<path d="M21 3L3 11l7 3 3 7z"/>',ops:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/>',mov:'<path d="M4 8h15l-4-4M20 16H5l4 4"/>',prof:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',sup:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',sec:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',net:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 15c2.5.5 4 2 4 5"/>',out:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',back:'<path d="M19 12H5M12 5l-7 7 7 7"/>',moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/>',bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0"/>',not:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0"/>',deu:'<circle cx="12" cy="12" r="9"/><path d="M12 7v6M9 12l3 3 3-3"/>',wallet:'<path d="M3 7a2 2 0 0 1 2-2h12v4M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2zM16 14h2"/>',trend:'<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>'};
 IC.ag=IC.prof;
 function ic(k,z){return'<svg width="'+z+'" height="'+z+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[k]+'</svg>'}
 function st(a,b){return'<div class="s"><small>'+a+'</small><b>'+b+'</b></div>'}
@@ -652,11 +667,66 @@ return'<div class="box"><h2>'+t("segur")+'</h2>'
 +'<input id="np" type="password" autocomplete="new-password" placeholder="'+t("pw")+' (min. 6)">'
 +'<input id="cp" type="password" autocomplete="new-password" placeholder="'+t("pw2")+'">'
 +'<button class="b neu" onclick="cambiarPass()">'+t("savec")+'</button></div>'}
+var usu=[],fnOk=null;
+function fnNoDesp(e){var s=(e&&(e.status||(e.context&&e.context.status)))||0;return s===404||(e&&e.message&&/not found|no encontrado/i.test(e.message))}
+function qa(s){return esc(String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'"))}
+function fErr(e){return t("fncerr")+((e&&(e.message||e.msg))||e||"")}
+async function fnCall(op,body){var r=await sb.functions.invoke("admin-users",{body:Object.assign({op:op},body)});if(r.error)throw r.error;fnOk=true;return r.data}
+async function cargarUsuarios(){if(!sb||!esAdmin){usu=[];return}try{var r=await sb.from("profiles").select("id,email,rol").order("email");usu=(r&&r.data)||[]}catch(e){usu=[]}}
+async function crearCuenta(){
+var a=document.getElementById("nem"),b=document.getElementById("npw"),c=document.getElementById("nrl");
+var e=a?a.value.trim():"",p=b?b.value:"",r=c?c.value:"trabajador";
+if(!e||!p){msg=t("ncam");draw();return}
+if(p.length<6){msg=t("npmin");draw();return}
+msg=t("load");draw();
+if(fnOk!==false){
+try{
+await fnCall("create",{email:e,password:p,rol:r});
+msg=t("creok");await cargarUsuarios();draw();return
+}catch(err){if(fnNoDesp(err)){fnOk=false}else{msg=fErr(err);await cargarUsuarios();draw();return}}
+}
+try{
+var res=await fetch(SB_URL+"/auth/v1/signup",{method:"POST",headers:{"apikey":SB_ANON,"Content-Type":"application/json"},body:JSON.stringify({email:e,password:p})});
+var jd=null;try{jd=await res.json()}catch(x){}
+if(!res.ok){msg=t("fncerr")+((jd&&(jd.msg||jd.message))||("HTTP "+res.status));await cargarUsuarios();draw();return}
+if(r!=="trabajador"){try{await sb.from("profiles").update({rol:r}).eq("email",e)}catch(x){}}
+msg=t("creok")+(jd&&jd.access_token?"":t("cfmail"));
+}catch(err){msg=fErr(err)}
+await cargarUsuarios();draw()}
+async function cambiarRol(id,rol){
+msg=t("load");draw();
+try{var r=await sb.from("profiles").update({rol:rol}).eq("id",id).select();if(r.error)throw r.error;if(id===sesion.user.id)await cargarRol();msg=""}catch(err){msg=fErr(err)}
+await cargarUsuarios();draw()}
+async function resetPass(email){
+msg=t("load");draw();
+try{await fnCall("reset",{email:email});msg=""}catch(err){msg=fnNoDesp(err)?t("fncno"):fErr(err)}
+draw()}
+async function borrarCuenta(id){
+msg=t("load");draw();
+try{await fnCall("delete",{id:id});msg=""}catch(err){msg=fnNoDesp(err)?t("fncno"):fErr(err)}
+await cargarUsuarios();draw()}
+function vUsers(){
+if(!sesion)return'<div class="box"><h2>'+t("usrT")+'</h2></div>';
+var yo=sesion.user.id;
+var lista=usu.map(function(u){
+return'<div class="ln" style="flex-wrap:wrap;align-items:center">'
++'<span style="flex:1;min-width:170px"><b>'+esc(u.email||"")+'</b><br><span class="mut" style="font-size:12px">'+t("rolu")+': '+(u.rol=="admin"?t("rolad"):t("roltr"))+'</span></span>'
++'<span class="row" style="gap:6px;flex-wrap:wrap">'
++(u.id==yo?"":'<button class="b neu" style="margin:0;padding:6px 10px;font-size:12px" onclick="cambiarRol(\''+qa(u.id)+'\',\''+(u.rol=="admin"?"trabajador":"admin")+'\')">'+(u.rol=="admin"?t("roltr"):t("rolad"))+'</button>')
++'<button class="b neu" style="margin:0;padding:6px 10px;font-size:12px" onclick="resetPass(\''+qa(u.email||"")+'\')">'+t("rpass")+'</button>'
++(u.id==yo?"":'<button class="b no" style="margin:0;padding:6px 10px;font-size:12px" onclick="borrarCuenta(\''+qa(u.id)+'\')">'+t("del")+'</button>')
++'</span></div>'}).join("");
+return'<div class="box"><h2>'+t("nuoc")+'</h2>'
++'<label>'+t("correo")+'</label><input id="nem" type="email" autocomplete="off" placeholder="correo@ejemplo.com">'
++'<label>'+t("pw")+' (min. 6)</label><input id="npw" type="password" autocomplete="new-password">'
++'<label>'+t("rolu")+'</label><select id="nrl"><option value="trabajador">'+t("roltr")+'</option><option value="admin">'+t("rolad")+'</option></select>'
++'<button class="b neu" style="width:100%" onclick="crearCuenta()">'+t("creoc")+'</button></div>'
++'<div class="box"><h2>'+t("clista")+'</h2>'+(lista||'<p class="mut">'+t("ssinus")+'</p>')+'</div>'}
 async function out(){dr=false;msg="";if(sb)try{await sb.auth.signOut()}catch(e){}sesion=null;esAdmin=false;tab="home";draw()}
 async function unl(){if(!sb){msg="No se pudo conectar con Supabase. Revisá la conexión a internet.";draw();return}
 var em=document.getElementById("lem"),pw=document.getElementById("lp");
 var e=em?em.value.trim():"",p=pw?pw.value:"";
-if(!e||!p){msg=t("err1");draw();return}
+if(!e||!p){msg=t("ncam");draw();return}
 msg=t("load");draw();
 var r=await sb.auth.signInWithPassword({email:e,password:p});
 if(r.error){msg=t("err_up");draw();return}
@@ -669,7 +739,7 @@ return'<div class="box" style="max-width:400px"><h2>'+t("padm")+'</h2>'
 +'<button class="b neu" style="width:100%" onclick="unl()">'+t("enter")+'</button>'
 +'<p class="mut" style="font-size:12px;margin:12px 0 0">'+t("noacct")+'</p></div>'}
 function drawer(){var it=function(k,l){if(SOLO_ADMIN[k]&&!esAdmin)return"";return'<button class="it'+(tab==k?" on":"")+'" onclick="go(\''+k+'\')">'+ic(k,22)+t(l)+'</button>'};
-return'<div class="ov" onclick="dr=false;draw()"></div><aside class="dr" aria-label="Menu">'+it("home","inicio")+it("not","ntT")+it("send","envio")+it("fac","facT")+it("ops","ops")+it("mov","mov")+it("net","redn")+it("deu","deuT")+it("ag","pag")+it("prof","perfil")+it("sup","soporte")+it("sec","segur")+'<div style="flex:1"></div><button class="it" style="border-top:1px solid var(--line);border-radius:0;color:var(--mut)" onclick="out()">'+ic("out",22)+t("out")+'</button></aside>'}
+return'<div class="ov" onclick="dr=false;draw()"></div><aside class="dr" aria-label="Menu">'+it("home","inicio")+it("not","ntT")+it("send","envio")+it("fac","facT")+it("ops","ops")+it("mov","mov")+it("net","redn")+it("deu","deuT")+it("ag","pag")+it("prof","perfil")+it("sup","soporte")+it("users","usrT")+it("sec","segur")+'<div style="flex:1"></div><button class="it" style="border-top:1px solid var(--line);border-radius:0;color:var(--mut)" onclick="out()">'+ic("out",22)+t("out")+'</button></aside>'}
 function mbc(){if(!lock&&tab=="send"&&sel){if(sel=="depo"&&bk)bk="";else{sel="";d={}}draw()}else{dr=!dr;draw()}}
 function tg(){var r=document.documentElement,dk=r.dataset.theme?r.dataset.theme=="dark":matchMedia("(prefers-color-scheme: dark)").matches;r.dataset.theme=dk?"light":"dark";persist()}
 function draw(){lock=!sesion;if(sesion&&SOLO_ADMIN[tab]&&!esAdmin){msg=t("denied");tab="home"}var sv0=!lock&&tab=="send"&&sel,nm=sel=="depo"&&bk?BK[bk].n:sel?SV[sel].n:"",pc=ops.filter(function(o){return o.st=="p"}).length;
@@ -678,7 +748,7 @@ document.getElementById("sbt").textContent=lock?"":tab=="home"?t("resop"):sv0?t(
 var mb=document.getElementById("mb");mb.style.display=lock?"none":"";mb.innerHTML=ic(sv0?"back":"menu",26);
 document.getElementById("hr").innerHTML=lock?"":'<button class="ib" aria-label="Theme" onclick="tg()">'+ic("moon",24)+'</button><button class="ib" aria-label="Notifications" onclick="go(\'not\')">'+ic("bell",24)+(ntUnread()?'<span class="bg">'+(ntUnread()>9?"9+":ntUnread())+'</span>':'')+'</button><img class="av" src="'+(pfPhoto||LOGO.av)+'" alt="">';
 document.getElementById("dw").innerHTML=dr&&!lock?drawer():"";
-var pg={home:vHome,deu:vDeu,not:vNot,send:vOps,fac:vFac,ops:vHist,mov:vMov,net:vRed,ag:vAg,prof:vProf,sup:vSup,sec:vSec};
+var pg={home:vHome,deu:vDeu,not:vNot,send:vOps,fac:vFac,ops:vHist,mov:vMov,net:vRed,ag:vAg,prof:vProf,sup:vSup,users:vUsers,sec:vSec};
 document.getElementById("main").innerHTML=lock?lockHtml():(msg?'<div class="box" role="status"><b>'+esc(msg)+'</b></div>':"")+(pend?'<div class="box" role="alertdialog" style="border:2px solid #1d4fd7"><b>'+esc(pend.txt)+'</b><div class="row" style="margin-top:10px"><button class="b" style="margin:0;background:#1f9d55" onclick="pendOk()">'+t("conf")+'</button><button class="b neu" style="margin:0" onclick="pendNo()">'+t("back")+'</button></div></div>':"")+pvHtml()+pg[tab]();eq();dtc();persist()}
 var SK="fpanel_v1",lastSave="";
 function snap(){return JSON.stringify({virt:virt,L:L,ops:ops,log:log,cnt:cnt,mvn:mvn,rt:rt,cr:cr,biz:biz,supNum:supNum,waMode:waMode,krDef:krDef,inv:inv,nts:nts,ct:ct,masters:masters,pfPhoto:pfPhoto,pfPhone:pfPhone,pfMail:pfMail,tdOn:tdOn,rd:rd,th:document.documentElement.dataset.theme||"",ts:Date.now()})}
