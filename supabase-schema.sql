@@ -10,8 +10,14 @@ create table if not exists public.profiles (
   email      text not null,
   rol        text not null default 'master'
              check (rol in ('admin', 'master')),
+  full_name  text,
+  username   text,
   creado_en  timestamptz not null default now()
 );
+
+create unique index if not exists profiles_username_key
+  on public.profiles (username)
+  where username is not null and username <> '';
 
 -- 1b. MIGRACION para bases ya existentes: elimina el rol 'trabajador'
 --     (queda solo 'admin'/'master'). Pega SOLO este bloque en el
@@ -53,8 +59,14 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.profiles (id, email, rol)
-  values (new.id, coalesce(new.email, ''), 'master')
+  insert into public.profiles (id, email, rol, full_name, username)
+  values (
+    new.id,
+    coalesce(new.email, ''),
+    'master',
+    coalesce(new.raw_user_meta_data->>'full_name', ''),
+    coalesce(new.raw_user_meta_data->>'username', '')
+  )
   on conflict (id) do nothing;
   return new;
 end;
@@ -65,6 +77,25 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row
   execute function public.handle_new_user();
+
+-- 3b. Login por "usuario o correo": devuelve el email del perfil
+--     (security definer para sortear la RLS de perfiles)
+-- ------------------------------------------------------------
+create or replace function public.email_por_usuario(uname text)
+returns text
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select email
+  from public.profiles
+  where username = uname
+  limit 1;
+$$;
+
+revoke execute on function public.email_por_usuario(text) from public;
+grant execute on function public.email_por_usuario(text) to authenticated;
 
 -- 4. Row Level Security
 --    Sin politicas, la tabla queda cerrada por defecto (lo correcto).

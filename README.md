@@ -4,7 +4,7 @@ Aplicación de gestión de un solo archivo (`index.html`, sin build ni dependenc
 
 ## Autenticación
 
-Login real contra **Supabase Auth** (`signInWithPassword`). La contraseña se valida en el servidor de Supabase sobre TLS y nunca se compara en el navegador. La pantalla de acceso tiene dos pestañas: **Iniciar Sesión** y **Registrarse** (`sb.auth.signUp`). Al pie del formulario se muestra el aviso **Modo Red** (los datos del panel se guardan en `localStorage` del equipo); si Supabase no responde, aparece un acceso simplificado en modo local.
+Login real contra **Supabase Auth** (`signInWithPassword`). La contraseña se valida en el servidor de Supabase sobre TLS y nunca se compara en el navegador. La pantalla de acceso tiene dos pestañas: **Iniciar Sesión** y **Registrarse** (`sb.auth.signUp`); el login acepta "Usuario o Correo" (si escribes el nombre de usuario, se resuelve su correo vía la función `email_por_usuario`). El registro pide Nombre Completo, Nombre de Usuario (min. 3), Correo, Contraseña (min. 6) y Confirmación, guardando nombre/usuario en los metadatos del perfil. Al pie del formulario se muestra el aviso **Modo Red** (los datos del panel se almacenan en `localStorage` del equipo); si Supabase no responde, aparece un acceso simplificado en modo local.
 
 | Rol | Acceso |
 |---|---|

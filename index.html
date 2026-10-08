@@ -93,7 +93,7 @@ function panelName(){return esAdmin?t("padm"):t("pmas")}
 function rolName(){return myRol=="admin"?t("rolad"):t("rolmas")}
 function rolOpts(sel){return[["admin","rolad"],["master","rolmas"]].map(function(o){return'<option value="'+o[0]+'"'+(sel==o[0]?" selected":"")+'>'+t(o[1])+'</option>'}).join("")}
 function myCode(){var s=String((sesion&&(sesion.user.id||sesion.user.email))||"");var h=0;for(var i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0}return"ST-AG-"+("000000"+h.toString(16).toUpperCase()).slice(-6)}
-function greetName(){var e=String((sesion&&sesion.user&&sesion.user.email)||"");var p=e.split("@")[0].replace(/[._\d]+/g," ").trim();if(p.length>=3)return p.charAt(0).toUpperCase()+p.slice(1);return t("rolmas")}
+function greetName(){var u=(sesion&&sesion.user&&(sesion.user.user_metadata||{}))||{};if(u.full_name)return u.full_name;if(u.username)return u.username;var e=String((sesion&&sesion.user&&sesion.user.email)||"");var p=e.split("@")[0].replace(/[._\d]+/g," ").trim();if(p.length>=3)return p.charAt(0).toUpperCase()+p.slice(1);return t("rolmas")}
 var rolP=null;
 async function cargarRol(){esAdmin=false;myRol="";if(!sesion||!sb)return;
 if(!rolP)rolP=(async function(){try{var r=await sb.from("profiles").select("rol").eq("id",sesion.user.id).single();
@@ -114,7 +114,7 @@ redag:["Rezo ajan mwen","Mi red de agentes","Mon réseau d'agents","My agent net
 out:["Dekonekte","Cerrar sesión","Se déconnecter","Log out","退出登录","Sair"],
 open:["Ouvri","Abrir","Ouvrir","Open","打开","Abrir"],
 setpin:["Defini PIN","Definir PIN","Définir le PIN","Set PIN","设置 PIN","Definir PIN"],
-enter:["Antre","Entrar","Entrer","Enter","进入","Entrar"],
+enter:["Antre","Ingresar","Entrer","Sign in","进入","Entrar"],
 badpin:["PIN pa bon.","PIN incorrecto.","PIN incorrect.","Incorrect PIN.","PIN 错误。","PIN incorreto."],
 env:["Voye","Enviar","Envoyer","Send","发送","Enviar"],
 rch:["Rechaj","Recarga","Recharge","Top-up","充值","Recarga"],
@@ -399,9 +399,18 @@ recovmail:["Nouvo modpas la voye pa imèl.","Te enviamos un correo para restable
 loginT:["Konekte","Iniciar sesión","Se connecter","Log in","登录","Iniciar sessão"],
 regT:["Enskri","Registrarse","S'inscrire","Register","注册","Registar"],
 regok:["Enskri resevwa, verifye imèl ou.","Registro recibido. Revisá tu correo para confirmar la cuenta.","Inscription reçue, vérifiez votre e-mail pour confirmer.","Registration received. Check your email to confirm.","注册成功，请查收确认邮件。","Registo recebido. Verifique o seu e-mail para confirmar."],
-redmode:["Mòd Red: done yo sove nan stokaj lokal machin sa a.","Modo Red: los datos se guardan en el almacenamiento local de este equipo.","Mode Réseau : les données sont stockées localement sur cet appareil.","Network mode: data is stored locally on this device.","网络模式：数据保存在本机本地存储中。","Modo Rede: os dados são guardados no armazenamento local deste dispositivo."],
+redmode:["Mòd Red: done yo sove lokalman nan machin sa a (localStorage).","Modo Red: los datos se almacenan localmente en este equipo (localStorage).","Mode Réseau : les données sont stockées localement sur cet appareil (localStorage).","Network mode: data is stored locally on this device (localStorage).","网络模式：数据保存在本机本地存储中（localStorage）。","Modo Rede: os dados são guardados localmente neste dispositivo (localStorage)."],
 locnote:["San Supabase. Ou ka antre an mòd lokal la.","Sin conexión a Supabase. Podés entrar en modo local.","Sans connexion Supabase. Vous pouvez entrer en mode local.","No Supabase connection. You can enter in local mode.","无法连接 Supabase，可进入本地模式。","Sem ligação ao Supabase. Pode entrar em modo local."],
 localin:["Antre (mòd lokal)","Entrar (modo local)","Entrer (mode local)","Enter (local mode)","进入（本地模式）","Entrar (modo local)"],
+accpanel:["Aksè nan Panel","Acceso al Panel","Accès au panneau","Panel access","访问面板","Acesso ao painel"],
+usercor:["Itilizatè oswa Imèl","Usuario o Correo","Utilisateur ou courriel","Username or Email","用户名或邮箱","Utilizador ou e-mail"],
+fullnam:["Non Konplè","Nombre Completo","Nom complet","Full Name","全名","Nome completo"],
+unam:["Non itilizatè","Nombre de Usuario","Nom d'utilisateur","Username","用户名","Nome de utilizador"],
+unmin:["Non itilizatè (min. 3)","Nombre de Usuario (min. 3)","Nom d'utilisateur (min. 3)","Username (min. 3)","用户名（至少3个字符）","Nome de utilizador (mín. 3)"],
+umin:["Non itilizatè dwe gen omwen 3 karaktè.","El nombre de usuario debe tener al menos 3 caracteres.","Le nom d'utilisateur doit comporter au moins 3 caractères.","Username must be at least 3 characters.","用户名至少需要 3 个字符。","O nome de utilizador deve ter pelo menos 3 caracteres."],
+nousact:["Ou pa gen kont? Enskri isit la","¿No tienes cuenta? Regístrate aquí","Pas de compte ? Inscrivez-vous ici","No account yet? Register here","没有账户？在此注册","Não tem conta? Registe-se aqui"],
+havact:["Ou gen kont? Konekte","¿Ya tienes cuenta? Inicia sesión","Déjà un compte ? Connectez-vous","Already have an account? Sign in","已有账户？登录","Já tem conta? Inicie sessão"],
+ejn:["Eg. Jan Pè","Ej. Juan Pérez","Ex. Jean Dupont","E.g. John Doe","示例：何塞·加西亚","Ex. João Silva"],
 rolu:["Ròl","Rol","Rôle","Role","角色","Função"],
 rolad:["Administratè","Administrador","Administrateur","Administrator","管理员","Administrador"],
 fncno:["Fonksyon sèvè a poko deploye. Kreye supabase/functions/admin-users.","La función del servidor aún no está desplegada. Creá supabase/functions/admin-users.","La fonction serveur n'est pas encore déployée. Créez supabase/functions/admin-users.","Server function not deployed yet. Create supabase/functions/admin-users.","服务器函数尚未部署。请创建 supabase/functions/admin-users。","Função do servidor ainda não implantada. Crie supabase/functions/admin-users."],
@@ -718,7 +727,7 @@ function fnNoDesp(e){var s=(e&&(e.status||(e.context&&e.context.status)))||0;ret
 function qa(s){return esc(String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'"))}
 function fErr(e){return t("fncerr")+((e&&(e.message||e.msg))||e||"")}
 async function fnCall(op,body){var r=await sb.functions.invoke("admin-users",{body:Object.assign({op:op},body)});if(r.error)throw r.error;fnOk=true;return r.data}
-async function cargarUsuarios(){if(!sb||!esAdmin){usu=[];return}try{var r=await sb.from("profiles").select("id,email,rol").order("email");usu=(r&&r.data)||[]}catch(e){usu=[]}}
+async function cargarUsuarios(){if(!sb||!esAdmin){usu=[];return}try{var r=await sb.from("profiles").select("id,email,rol,full_name,username").order("email");usu=(r&&r.data)||[]}catch(e){usu=[]}}
 async function crearCuenta(){
 var a=document.getElementById("nem"),b=document.getElementById("npw"),c=document.getElementById("nrl");
 var e=a?a.value.trim():"",p=b?b.value:"",r=c?c.value:"master";
@@ -756,7 +765,7 @@ if(!sesion)return'<div class="box"><h2>'+t("usrT")+'</h2></div>';
 var yo=sesion.user.id;
 var lista=usu.map(function(u){
 return'<div class="ln" style="flex-wrap:wrap;align-items:center">'
-+'<span style="flex:1;min-width:170px"><b>'+esc(u.email||"")+'</b><br><span class="mut" style="font-size:12px">'+t("rolu")+': '+(u.rol=="admin"?t("rolad"):t("rolmas"))+'</span></span>'
++'<span style="flex:1;min-width:170px"><b>'+esc(u.full_name||u.email||"")+'</b>'+(u.full_name?'<br><span class="mut" style="font-size:12px">'+esc(u.email)+(u.username?" · @"+esc(u.username):"")+'</span>':"")+'<br><span class="mut" style="font-size:12px">'+t("rolu")+': '+(u.rol=="admin"?t("rolad"):t("rolmas"))+'</span></span>'
 +'<span class="row" style="gap:6px;flex-wrap:wrap">'
 +(u.id==yo?"":'<select style="width:auto;font-size:12px;padding:6px 8px;flex:none" aria-label="'+t("rolu")+'" onchange="cambiarRol(\''+qa(u.id)+'\',this.value)">'+rolOpts(u.rol=="admin"?"admin":"master")+'</select>')
 +'<button class="b neu" style="margin:0;padding:6px 10px;font-size:12px" onclick="resetPass(\''+qa(u.email||"")+'\')">'+t("rpass")+'</button>'
@@ -787,21 +796,24 @@ var em=document.getElementById("lem"),pw=document.getElementById("lp");
 var e=em?em.value.trim():"",p=pw?pw.value:"";
 if(!e||!p){msg=t("ncam");draw();return}
 msg=t("load");draw();
-var r=await sb.auth.signInWithPassword({email:e,password:p});
+var email=e;
+if(e.indexOf("@")<0){try{var qr=await sb.rpc("email_por_usuario",{uname:e});if(qr.error||!qr.data){msg=t("err_up");draw();return}email=qr.data}catch(err){msg=t("err_up");draw();return}}
+var r=await sb.auth.signInWithPassword({email:email,password:p});
 if(r.error){msg=t("err_up");draw();return}
 sesion=r.data.session;msg="";await cargarRol();draw()}
 function authSet(k){authTab=k;msg="";draw()}
 function localIn(){sesion={user:{id:"local",email:"red-local"}};myRol="master";esAdmin=false;tab="home";msg="";dr=false;draw()}
 async function authReg(){
-  var a=document.getElementById("rem"),b=document.getElementById("rp"),c=document.getElementById("rp2");
-  var e=a?a.value.trim():"",p=b?b.value:"",cf=c?c.value:"";
-  if(!e||!p||!cf){msg=t("ncam");draw();return}
+  var a=document.getElementById("rem"),b=document.getElementById("rp"),c=document.getElementById("rp2"),f=document.getElementById("rfn"),u=document.getElementById("run");
+  var e=a?a.value.trim():"",p=b?b.value:"",cf=c?c.value:"",fn=f?f.value.trim():"",un=u?u.value.trim():"";
+  if(!e||!p||!cf||!fn||!un){msg=t("ncam");draw();return}
+  if(un.length<3){msg=t("umin");draw();return}
   if(p.length<6){msg=t("npmin");draw();return}
   if(p!==cf){msg=t("e_cf");draw();return}
   if(!sb){msg="";draw();return}
   msg=t("load");draw();
   try{
-    var r=await sb.auth.signUp({email:e,password:p});
+    var r=await sb.auth.signUp({email:e,password:p,options:{data:{full_name:fn,username:un}}});
     if(r.error){msg=fErr(r.error);draw();return}
     if(r.data&&r.data.session){sesion=r.data.session;msg="";await cargarRol();tab="home";draw();return}
     msg=t("regok");authTab="login";draw()
@@ -814,19 +826,25 @@ if(!sb)return'<div class="box" style="max-width:400px"><h2>'+t("padm")+'</h2>'
 +'<p style="font-size:11px;margin:14px 0 0;color:var(--mut);text-align:center">'+t("redmode")+'</p></div>';
 var isReg=authTab=="reg";
 return'<div class="box" style="max-width:400px"><h2>'+t("padm")+'</h2>'
++'<p class="mut" style="font-size:12px;margin:-8px 0 12px">'+t("accpanel")+'</p>'
 +'<div class="seg" style="margin:0 0 14px" role="tablist">'
 +'<button type="button" style="flex:1" class="'+(isReg?"":"on")+'" role="tab" aria-selected="'+(!isReg)+'" onclick="authSet(\'login\')">'+t("loginT")+'</button>'
 +'<button type="button" style="flex:1" class="'+(isReg?"on":"")+'" role="tab" aria-selected="'+isReg+'" onclick="authSet(\'reg\')">'+t("regT")+'</button></div>'
 +(msg?'<p role="status"><b>'+esc(msg)+'</b></p>':'')
 +(isReg
- ?'<label>'+t("correo")+'</label><input id="rem" type="email" autocomplete="username" placeholder="correo@ejemplo.com" onkeydown="if(event.key==\'Enter\')authReg()">'
+ ?'<p style="font-size:13px;font-weight:600;margin:2px 0 10px">'+t("regT")+'</p>'
+ +'<label>'+t("fullnam")+'</label><input id="rfn" type="text" autocomplete="name" placeholder="'+t("ejn")+'" onkeydown="if(event.key==\'Enter\')authReg()">'
+ +'<label>'+t("unmin")+'</label><input id="run" type="text" autocomplete="username" placeholder="'+t("unam")+'" onkeydown="if(event.key==\'Enter\')authReg()">'
+ +'<label>'+t("correo")+'</label><input id="rem" type="email" autocomplete="username" placeholder="correo@ejemplo.com" onkeydown="if(event.key==\'Enter\')authReg()">'
  +'<label>'+t("pw")+' (min. 6)</label><input id="rp" type="password" autocomplete="new-password" onkeydown="if(event.key==\'Enter\')authReg()">'
  +'<label>'+t("pw2")+'</label><input id="rp2" type="password" autocomplete="new-password" onkeydown="if(event.key==\'Enter\')authReg()">'
  +'<button class="b neu" style="width:100%" onclick="authReg()">'+t("regT")+'</button>'
- :'<label>'+t("correo")+'</label><input id="lem" type="email" autocomplete="username" placeholder="correo@ejemplo.com" onkeydown="if(event.key==\'Enter\')unl()">'
+ +'<div style="text-align:center;margin-top:10px"><button class="b" style="margin:0;padding:4px 8px;font-size:12px;background:transparent" onclick="authSet(\'login\')">'+t("havact")+'</button></div>'
+ :'<label>'+t("usercor")+'</label><input id="lem" type="text" autocomplete="username" placeholder="'+t("unam")+' o correo@ejemplo.com" onkeydown="if(event.key==\'Enter\')unl()">'
  +'<label>'+t("pw")+'</label><input id="lp" type="password" autocomplete="current-password" onkeydown="if(event.key==\'Enter\')unl()">'
  +'<button class="b neu" style="width:100%" onclick="unl()">'+t("enter")+'</button>'
- +'<div style="display:flex;justify-content:center;margin:12px 0 0"><button class="b neu" style="margin:0;padding:6px 10px;font-size:12px" onclick="forgot()">'+t("forgotpw")+'</button></div>')
+ +'<div style="display:flex;justify-content:center;margin:12px 0 0"><button class="b neu" style="margin:0;padding:6px 10px;font-size:12px" onclick="forgot()">'+t("forgotpw")+'</button></div>'
+ +'<div style="text-align:center;margin-top:10px"><button class="b" style="margin:0;padding:4px 8px;font-size:12px;background:transparent" onclick="authSet(\'reg\')">'+t("nousact")+'</button></div>')
 +'<p style="font-size:11px;margin:14px 0 0;color:var(--mut);text-align:center">'+t("redmode")+'</p></div>'}
 function drawer(){var it=function(k,l){if(!allow(k))return"";return'<button class="it'+(tab==k?" on":"")+'" onclick="go(\''+k+'\')">'+ic(k,22)+t(l)+'</button>'};
 return'<div class="ov" onclick="dr=false;draw()"></div><aside class="dr" aria-label="Menu">'+(sesion&&myRol!="admin"?'<div style="display:flex;align-items:center;gap:12px;padding:14px 12px;border-bottom:1px solid var(--line);margin-bottom:6px">'+(pfPhoto?'<img class="av" style="width:46px;height:46px;flex:none" src="'+pfPhoto+'" alt="">':'<span class="lb" style="width:46px;height:46px;border-radius:50%;font-weight:800;font-size:20px;flex:none">'+esc(String(greetName()).charAt(0).toUpperCase())+'</span>')+'<div style="flex:1;min-width:0"><b style="font-size:15px">'+esc(greetName())+'</b><br><span class="mut" style="font-size:12px">'+esc(myCode())+' · '+rolName()+'</span></div></div>':'')+it("home","inicio")+it("not","ntT")+it("send","envio")+it("fac","facT")+it("ops","ops")+it("mov","mov")+(myRol=="master"?'<button class="it'+(tab=="net"?" on":"")+'" onclick="go(\'net\')">'+ic("net",22)+'Red</button>':it("net",redKey()))+it("deu","deuT")+it("ag","pag")+it("prof","perfil")+it("sup","soporte")+it("users","usrT")+it("sec","segur")+'<div style="flex:1"></div><button class="it" style="border-top:1px solid var(--line);border-radius:0;color:var(--mut)" onclick="out()">'+ic("out",22)+t("out")+'</button></aside>'}
