@@ -85,7 +85,7 @@ header h1{font-size:18px}.htl{flex:1;min-width:0}.htl small{display:block;color:
 var SB_URL="https://qjcwtejemgtdosioebtk.supabase.co";
 var SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqY3d0ZWplbWd0ZG9zaW9lYnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMDQwMjksImV4cCI6MjEwNjg4MDAyOX0.5XjDrMLJ7RVzPfDt8OGzsbRK2m6CufBNHaHZJra6U3k";
 var sb=null;
-try{if(window.supabase&&window.supabase.createClient){var sess=window.sessionStorage||window.localStorage;sb=window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:sess,persistSession:true,autoRefreshToken:true}})}else{sb=null}}catch(e){sb=null}
+try{if(window.supabase&&window.supabase.createClient){var sess=window.sessionStorage;sb=window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:sess,persistSession:true,autoRefreshToken:true}})}else{sb=null}}catch(e){sb=null}
 var sesion=null,esAdmin=false,myRol="";
 function allow(k){if(k=="users"||k=="deu"||k=="ag")return esAdmin;if(k=="net")return esAdmin||myRol=="master";if(k=="mov")return esAdmin||myRol=="master";if(k=="not"||k=="fac")return myRol!="master";return true}
 function redKey(){return myRol=="master"?"mired":"redn"}
@@ -399,9 +399,6 @@ recovmail:["Nouvo modpas la voye pa imèl.","Te enviamos un correo para restable
 loginT:["Konekte","Iniciar sesión","Se connecter","Log in","登录","Iniciar sessão"],
 regT:["Enskri","Registrarse","S'inscrire","Register","注册","Registar"],
 regok:["Enskri resevwa, verifye imèl ou.","Registro recibido. Revisá tu correo para confirmar la cuenta.","Inscription reçue, vérifiez votre e-mail pour confirmer.","Registration received. Check your email to confirm.","注册成功，请查收确认邮件。","Registo recebido. Verifique o seu e-mail para confirmar."],
-redmode:["Mòd Red: done yo sove lokalman nan machin sa a (localStorage).","Modo Red: los datos se almacenan localmente en este equipo (localStorage).","Mode Réseau : les données sont stockées localement sur cet appareil (localStorage).","Network mode: data is stored locally on this device (localStorage).","网络模式：数据保存在本机本地存储中（localStorage）。","Modo Rede: os dados são guardados localmente neste dispositivo (localStorage)."],
-locnote:["San Supabase. Ou ka antre an mòd lokal la.","Sin conexión a Supabase. Podés entrar en modo local.","Sans connexion Supabase. Vous pouvez entrer en mode local.","No Supabase connection. You can enter in local mode.","无法连接 Supabase，可进入本地模式。","Sem ligação ao Supabase. Pode entrar em modo local."],
-localin:["Antre (mòd lokal)","Entrar (modo local)","Entrer (mode local)","Enter (local mode)","进入（本地模式）","Entrar (modo local)"],
 accpanel:["Aksè nan Panel","Acceso al Panel","Accès au panneau","Panel access","访问面板","Acesso ao painel"],
 usercor:["Itilizatè oswa Imèl","Usuario o Correo","Utilisateur ou courriel","Username or Email","用户名或邮箱","Utilizador ou e-mail"],
 fullnam:["Non Konplè","Nombre Completo","Nom complet","Full Name","全名","Nome completo"],
@@ -802,7 +799,6 @@ var r=await sb.auth.signInWithPassword({email:email,password:p});
 if(r.error){msg=t("err_up");draw();return}
 sesion=r.data.session;msg="";await cargarRol();draw()}
 function authSet(k){authTab=k;msg="";draw()}
-function localIn(){sesion={user:{id:"local",email:"red-local"}};myRol="master";esAdmin=false;tab="home";msg="";dr=false;draw()}
 async function authReg(){
   var a=document.getElementById("rem"),b=document.getElementById("rp"),c=document.getElementById("rp2"),f=document.getElementById("rfn"),u=document.getElementById("run");
   var e=a?a.value.trim():"",p=b?b.value:"",cf=c?c.value:"",fn=f?f.value.trim():"",un=u?u.value.trim():"";
@@ -820,10 +816,7 @@ async function authReg(){
   }catch(err){msg=fErr(err);draw()}
 }
 function lockHtml(){
-if(!sb)return'<div class="box" style="max-width:400px"><h2>'+t("padm")+'</h2>'
-+'<p class="mut" role="status" style="font-size:13px">'+t("locnote")+'</p>'
-+'<button class="b neu" style="width:100%" onclick="localIn()">'+t("localin")+'</button>'
-+'<p style="font-size:11px;margin:14px 0 0;color:var(--mut);text-align:center">'+t("redmode")+'</p></div>';
+if(!sb)return'<div class="box" style="max-width:400px"><h2>'+t("padm")+'</h2><p role="status"><b>No se pudo conectar con Supabase. Revisá tu conexión a internet y recargá la página.</b></p></div>';
 var isReg=authTab=="reg";
 return'<div class="box" style="max-width:400px"><h2>'+t("padm")+'</h2>'
 +'<p class="mut" style="font-size:12px;margin:-8px 0 12px">'+t("accpanel")+'</p>'
@@ -845,7 +838,7 @@ return'<div class="box" style="max-width:400px"><h2>'+t("padm")+'</h2>'
  +'<button class="b neu" style="width:100%" onclick="unl()">'+t("enter")+'</button>'
  +'<div style="display:flex;justify-content:center;margin:12px 0 0"><button class="b neu" style="margin:0;padding:6px 10px;font-size:12px" onclick="forgot()">'+t("forgotpw")+'</button></div>'
  +'<div style="text-align:center;margin-top:10px"><button class="b" style="margin:0;padding:4px 8px;font-size:12px;background:transparent" onclick="authSet(\'reg\')">'+t("nousact")+'</button></div>')
-+'<p style="font-size:11px;margin:14px 0 0;color:var(--mut);text-align:center">'+t("redmode")+'</p></div>'}
++'</div>'}
 function drawer(){var it=function(k,l){if(!allow(k))return"";return'<button class="it'+(tab==k?" on":"")+'" onclick="go(\''+k+'\')">'+ic(k,22)+t(l)+'</button>'};
 return'<div class="ov" onclick="dr=false;draw()"></div><aside class="dr" aria-label="Menu">'+(sesion&&myRol!="admin"?'<div style="display:flex;align-items:center;gap:12px;padding:14px 12px;border-bottom:1px solid var(--line);margin-bottom:6px">'+(pfPhoto?'<img class="av" style="width:46px;height:46px;flex:none" src="'+pfPhoto+'" alt="">':'<span class="lb" style="width:46px;height:46px;border-radius:50%;font-weight:800;font-size:20px;flex:none">'+esc(String(greetName()).charAt(0).toUpperCase())+'</span>')+'<div style="flex:1;min-width:0"><b style="font-size:15px">'+esc(greetName())+'</b><br><span class="mut" style="font-size:12px">'+esc(myCode())+' · '+rolName()+'</span></div></div>':'')+it("home","inicio")+it("not","ntT")+it("send","envio")+it("fac","facT")+it("ops","ops")+it("mov","mov")+(myRol=="master"?'<button class="it'+(tab=="net"?" on":"")+'" onclick="go(\'net\')">'+ic("net",22)+'Red</button>':it("net",redKey()))+it("deu","deuT")+it("ag","pag")+it("prof","perfil")+it("sup","soporte")+it("users","usrT")+it("sec","segur")+'<div style="flex:1"></div><button class="it" style="border-top:1px solid var(--line);border-radius:0;color:var(--mut)" onclick="out()">'+ic("out",22)+t("out")+'</button></aside>'}
 function mbc(){if(!lock&&tab=="send"&&sel){if(sel=="depo"&&bk)bk="";else{sel="";d={}}draw()}else{dr=!dr;draw()}}
@@ -876,17 +869,31 @@ document.getElementById("hr").innerHTML=lock?"":'<button class="ib" aria-label="
 document.getElementById("dw").innerHTML=dr&&!lock?drawer():"";
 var pg={home:(myRol=="master"?vHomeM:vHome),deu:vDeu,not:vNot,send:vOps,fac:vFac,ops:vHist,mov:(myRol=="master"?vMovM:vMov),net:vRed,ag:vAg,prof:vProf,sup:vSup,users:vUsers,sec:vSec,reset:vReset};
 document.getElementById("main").innerHTML=lock?lockHtml():(msg?'<div class="box" role="status"><b>'+esc(msg)+'</b></div>':"")+(pend?'<div class="box" role="alertdialog" style="border:2px solid #c8102e"><b>'+esc(pend.txt)+'</b><div class="row" style="margin-top:10px"><button class="b" style="margin:0;background:#1f9d55" onclick="pendOk()">'+t("conf")+'</button><button class="b neu" style="margin:0" onclick="pendNo()">'+t("back")+'</button></div></div>':"")+pvHtml()+pg[tab]();eq();dtc();persist()}
-var SK="fpanel_v1",lastSave="";
+var lastSave="",lastSent="",saveTimer=null,chan=null;
 function snap(){return JSON.stringify({virt:virt,L:L,ops:ops,log:log,cnt:cnt,mvn:mvn,rt:rt,cr:cr,biz:biz,supNum:supNum,waMode:waMode,krDef:krDef,inv:inv,nts:nts,ct:ct,masters:masters,pfPhoto:pfPhoto,pfPhone:pfPhone,pfMail:pfMail,tdOn:tdOn,rd:rd,th:document.documentElement.dataset.theme||"",ts:Date.now()})}
 function snapKey(){var o=JSON.parse(snap());delete o.ts;return JSON.stringify(o)}
 function apply(o){if(!o)return;virt=(o.virt||0)+(o.vrt||0);L=o.L||0;ops=o.ops||[];log=(o.log||[]).map(function(e,i){return Array.isArray(e)?{n:-(i+1),ty:"old",lb:e[0],tx:e[1],st:"ok",d:""}:e});mvn=o.mvn||0;cnt=o.cnt||0;if(o.rt)rt=o.rt;if(o.cr)cr=Object.assign({MXN:52},o.cr);biz=o.biz||biz;supNum=o.supNum||"+56927082980";waMode=o.waMode||"ma";ct=o.ct||"ht";masters=o.masters||[];krDef=o.krDef||0;nts=o.nts||[];masters.forEach(function(m){if(!m.code)m.code=newCode("MA");mig(m);(m.ags||[]).forEach(function(g){if(!g.code)g.code=newCode("AG");mig(g)})});inv=o.inv||[];masters.forEach(function(m){[m].concat(m.ags||[]).forEach(function(a){if(a.saldo<0){a.db=(a.db||0)-a.saldo;a.saldo=0}if(a.dt){if(a.kr==null)a.kr=a.dl>0?a.dl:1e9;delete a.dt;delete a.dl}})});pfPhoto=o.pfPhoto||"";pfPhone=o.pfPhone||"";pfMail=o.pfMail||"";tdOn=o.tdOn!==false;rd=o.rd||"";if(o.th)document.documentElement.dataset.theme=o.th;document.documentElement.lang=["ht","es","fr","en","zh","pt"][L];last=null}
-function persist(){var k=snapKey();if(k==lastSave)return;lastSave=k;var s0=snap();try{localStorage.setItem(SK,s0)}catch(e){}}
+function persist(){var k=snapKey();if(k==lastSave)return;lastSave=k;if(saveTimer)clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,500)}
+async function saveNow(){if(!sb||!sesion)return;var k=lastSave;if(k==lastSent)return;var o=null;try{o=JSON.parse(snap())}catch(e){}if(!o)return;
+var row={id:"panel",data:o,saldos:{virt:o.virt,masters:o.masters,rt:o.rt,cr:o.cr},ops:{ops:o.ops,log:o.log,mvn:o.mvn},nts:o.nts,inv:o.inv,cfg:{biz:o.biz,supNum:o.supNum,waMode:o.waMode,krDef:o.krDef,ct:o.ct,tdOn:o.tdOn,rd:o.rd,L:o.L,th:o.th,pfPhoto:o.pfPhoto,pfPhone:o.pfPhone,pfMail:o.pfMail,cnt:o.cnt}};
+var r=null;try{r=await sb.from("panel_state").upsert(row,{onConflict:"id"})}catch(e){r=null}if(r&&!r.error)lastSent=k}
+async function loadState(){if(!sb)return;
+try{
+var r=await sb.from("panel_state").select("id,data").eq("id","panel").maybeSingle();
+if(r.error)throw r.error;
+if(r.data&&r.data.data){lastSent=snapKey();apply(r.data.data);return}
+var legacy=null;try{legacy=typeof localStorage!=="undefined"?localStorage.getItem("fpanel_v1"):null}catch(e){legacy=null}
+if(legacy){try{apply(JSON.parse(legacy))}catch(e){}}
+persist()
+}catch(e){}}
+function subLive(){if(!sb||chan)return;try{chan=sb.channel("panel-live").on("postgres_changes",{event:"*",schema:"public",table:"panel_state"},function(p){if(!p.new||!p.new.data)return;var me=(sesion&&sesion.user&&sesion.user.id)||null;if(p.new.updated_by===me)return;apply(p.new.data);lastSave="";lastSent="";draw()}).subscribe()}catch(e){}}
 (async function(){
 try{if(sb)var s0=await sb.auth.getSession();sesion=(s0&&s0.data.session)||null}catch(e){sesion=null}
 if(sesion)await cargarRol();
-try{var a=localStorage.getItem(SK);if(a)apply(JSON.parse(a))}catch(e){}
+await loadState();
 lastSave=snapKey();draw();
-if(sb)try{sb.auth.onAuthStateChange(function(ev,s){sesion=s||null;if(ev==="PASSWORD_RECOVERY"){tab="reset";draw();return}if(sesion){cargarRol().then(function(){draw()})}else{esAdmin=false;draw()}})}catch(e){}
+subLive();
+if(sb)try{sb.auth.onAuthStateChange(function(ev,s){sesion=s||null;if(ev==="PASSWORD_RECOVERY"){tab="reset";draw();return}if(sesion){cargarRol().then(async function(){await loadState();lastSave=snapKey();draw()})}else{esAdmin=false;draw()}})}catch(e){}
 setTimeout(async function(){
   try{
     if(!sb)return;
@@ -898,7 +905,7 @@ setTimeout(async function(){
     }
   }catch(e){}
 },600);
-lastSave="";persist()})();
+})();
 </script>
 </body>
 </html>

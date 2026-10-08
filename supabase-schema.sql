@@ -3,6 +3,97 @@
 -- Pegar completo en: Supabase Dashboard > SQL Editor > Run
 -- ============================================================
 
+-- 0. ESTADO DEL PANEL EN LA NUBE (panel_state)
+--    Reemplaza a localStorage. Una fila 'panel' con el estado
+--    operativo completo + columnas por dominio. Se sincroniza
+--    entre dispositivos via Realtime.
+-- ------------------------------------------------------------
+create table if not exists public.panel_state (
+  id         text primary key default 'panel',
+  data       jsonb not null default '{}'::jsonb,
+  saldos     jsonb,
+  ops        jsonb,
+  log        jsonb,
+  mvn        jsonb,
+  nts        jsonb,
+  inv        jsonb,
+  cfg        jsonb,
+  updated_at timestamptz not null default now(),
+  updated_by uuid
+);
+
+insert into public.panel_state (id, data)
+values ('panel', '{}'::jsonb)
+on conflict (id) do nothing;
+
+alter table public.panel_state enable row level security;
+
+revoke all on table public.panel_state from anon, public;
+grant select, insert, update on table public.panel_state to authenticated;
+
+create or replace function public.panel_state_touch()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  new.updated_at = now();
+  new.updated_by = auth.uid();
+  return new;
+end;
+$$;
+
+drop trigger if exists panel_state_touch_trigger on public.panel_state;
+create trigger panel_state_touch_trigger
+  before insert or update on public.panel_state
+  for each row
+  execute function public.panel_state_touch();
+
+-- solo admin o master operan el panel
+create or replace function public.es_master()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles
+    where id = (select auth.uid())
+      and rol in ('admin', 'master')
+  );
+$$;
+
+revoke all on function public.es_master() from public;
+grant execute on function public.es_master() to authenticated;
+
+drop policy if exists "panel_state: lectura" on public.panel_state;
+create policy "panel_state: lectura"
+  on public.panel_state for select
+  to authenticated
+  using (true);
+
+drop policy if exists "panel_state: escritura" on public.panel_state;
+create policy "panel_state: escritura"
+  on public.panel_state for insert
+  to authenticated
+  with check (public.es_master());
+
+drop policy if exists "panel_state: modificacion" on public.panel_state;
+create policy "panel_state: modificacion"
+  on public.panel_state for update
+  to authenticated
+  using (public.es_master())
+  with check (public.es_master());
+
+do $$
+begin
+  alter publication supabase_realtime add table public.panel_state;
+exception when duplicate_object then
+  null;
+end $$;
+
 -- 1. Tabla de perfiles con rol
 -- ------------------------------------------------------------
 create table if not exists public.profiles (
