@@ -8,18 +8,19 @@
 create table if not exists public.profiles (
   id         uuid primary key references auth.users(id) on delete cascade,
   email      text not null,
-  rol        text not null default 'trabajador'
-             check (rol in ('admin', 'master', 'trabajador')),
+  rol        text not null default 'master'
+             check (rol in ('admin', 'master')),
   creado_en  timestamptz not null default now()
 );
 
--- 1b. MIGRACION para bases ya existentes: agrega el rol 'master'
---     (la constraint vieja solo aceptaba 'admin'/'trabajador').
---     Pega SOLO este bloque en el SQL Editor la primera vez.
+-- 1b. MIGRACION para bases ya existentes: elimina el rol 'trabajador'
+--     (queda solo 'admin'/'master'). Pega SOLO este bloque en el
+--     SQL Editor la primera vez.
 -- ------------------------------------------------------------
+-- update public.profiles set rol = 'master' where rol = 'trabajador';
 -- alter table public.profiles drop constraint if exists profiles_rol_check;
 -- alter table public.profiles add constraint profiles_rol_check
---   check (rol in ('admin', 'master', 'trabajador'));
+--   check (rol in ('admin', 'master'));
 
 -- 2. Funcion security definer - evita la recursion infinita de RLS
 --    Si la politica consultara la misma tabla sin esto, Postgres
@@ -53,7 +54,7 @@ set search_path = public
 as $$
 begin
   insert into public.profiles (id, email, rol)
-  values (new.id, coalesce(new.email, ''), 'trabajador')
+  values (new.id, coalesce(new.email, ''), 'master')
   on conflict (id) do nothing;
   return new;
 end;
@@ -92,7 +93,7 @@ using ((select public.es_admin()));
 
 -- Solo el admin puede cambiar roles.
 -- OJO: NO hay politica de update sobre el propio registro,
--- por eso un trabajador NO se puede autopromover a admin.
+-- por eso un usuario NO se puede autopromover a admin.
 drop policy if exists "admin: actualiza perfiles" on public.profiles;
 create policy "admin: actualiza perfiles"
 on public.profiles for update

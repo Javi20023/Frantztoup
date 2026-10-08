@@ -1,7 +1,7 @@
 // ============================================================
 // Funcion: admin-users
 // Proposito: permitirle al DUENO crear, restablecer y eliminar
-//            cuentas de trabajadores sin exponer la clave
+//            cuentas de usuario (admin/master) sin exponer la clave
 //            service_role en el navegador.
 //
 // Despliegue:
@@ -97,14 +97,14 @@ Deno.serve(async (req: Request) => {
   const op = String(body.op ?? "");
 
   // ----------------------------------------------------------
-  // create - crear cuenta de trabajador
+  // create - crear cuenta de usuario (rol: admin | master)
   // ----------------------------------------------------------
   if (op === "create") {
     const email = String(body.email ?? "").trim().toLowerCase();
     const password = String(body.password ?? "");
     const rol = ["admin", "master"].includes(String(body.rol))
       ? String(body.rol)
-      : "trabajador";
+      : "master";
 
     if (!EMAIL_RE.test(email)) {
       return json({ error: "Correo invalido" }, 400);
