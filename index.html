@@ -97,7 +97,7 @@ function greetName(){var u=(sesion&&sesion.user&&(sesion.user.user_metadata||{})
 var rolP=null;
 async function cargarRol(){esAdmin=false;myRol="";if(!sesion||!sb)return;
 if(!rolP)rolP=(async function(){try{var r=await sb.from("profiles").select("rol").eq("id",sesion.user.id).single();
-if(r.data){myRol=r.data.rol=="admin"?"admin":"master";esAdmin=myRol=="admin";msg=""}else{msg=t("noperfil")}}catch(e){esAdmin=false;myRol="";msg=t("noperfil")}finally{rolP=null}})();
+if(r.data){myRol=r.data.rol=="admin"?"admin":"master";esAdmin=myRol=="admin";msg="";if(esAdmin&&typeof cargarUsuarios=="function"){cargarUsuarios().then(function(){try{draw()}catch(e){}}).catch(function(){})}}else{msg=t("noperfil")}}catch(e){esAdmin=false;myRol="";msg=t("noperfil")}finally{rolP=null}})();
 return rolP}
 var authTab="login";
 function vHomeM(){var td=pdate(),hoy=ops.filter(function(o){return o.date.slice(0,10)==td}),tot=hoy.reduce(function(s,o){return s+o.tot},0),pc=hoy.filter(function(o){return o.st=="p"}).length,cc=hoy.filter(function(o){return o.st=="c"}).length,rc=hoy.filter(function(o){return o.st=="r"}).length;
@@ -193,12 +193,12 @@ return'<div class="ln" style="flex-wrap:wrap;align-items:center">'
 +'<button class="b neu" style="margin:0;padding:6px 10px;font-size:12px" onclick="resetPass(\''+qa(u.email||"")+'\')">'+t("rpass")+'</button>'
 +(u.id==yo?"":'<button class="b no" style="margin:0;padding:6px 10px;font-size:12px" onclick="borrarCuenta(\''+qa(u.id)+'\')">'+t("del")+'</button>')
 +'</span></div>'}).join("");
-return'<div class="box"><h2>'+t("nuoc")+'</h2>'
+return'<div class="box"><h2>'+t("usrT")+' · '+t("nuoc")+'</h2>'
 +'<label>'+t("correo")+'</label><input id="nem" type="email" autocomplete="off" placeholder="correo@ejemplo.com">'
 +'<label>'+t("pw")+' (min. 6)</label><input id="npw" type="password" autocomplete="new-password">'
 +'<label>'+t("rolu")+'</label><select id="nrl">'+rolOpts("master")+'</select>'
 +'<button class="b neu" style="width:100%" onclick="crearCuenta()">'+t("creoc")+'</button></div>'
-+'<div class="box"><h2>'+t("clista")+'</h2>'+(lista||'<p class="mut">'+t("ssinus")+'</p>')+'</div>'}
++'<div class="box"><h2>'+t("usrT")+' · '+t("clista")+'</h2>'+(lista||'<p class="mut">'+t("ssinus")+'</p>')+'</div>'}
 function vProf(){return fsBox()+'<div class="box"><h2>'+t("perfil")+'</h2><div class="hd"><img class="av" style="width:72px;height:72px" src="'+(pfPhoto||LOGO.av)+'" alt=""><div><label style="margin:0 0 4px">'+t("foto")+'</label><input type="file" accept="image/*" onchange="setPh(this)">'+(pfPhoto?'<button class="b no" onclick="pfPhoto=\'\';draw()">'+t("quit")+'</button>':'')+'</div></div><label>'+t("cuen")+'</label><input type="text" value="'+esc(biz)+'" oninput="biz=this.value;persist()"><label>'+t("phone")+'</label><input type="tel" value="'+esc(pfPhone)+'" oninput="pfPhone=this.value;persist()"><label>'+t("mail")+'</label><input type="email" value="'+esc(pfMail)+'" oninput="pfMail=this.value;persist()"></div>'+'<div class="box"><h2>'+t("lang")+'</h2>'+["Kreyòl","Español","Français","English","中文","Português"].map(function(n,i){return'<button class="b '+(i==L?"ok":"neu")+'" onclick="L='+i+';document.documentElement.lang=[\'ht\',\'es\',\'fr\',\'en\',\'zh\',\'pt\']['+i+'];draw()">'+n+'</button>'}).join("")+'</div>'+
 '<div class="box"><h2>'+t("krd")+'</h2><input type="number" min="0" step="any" inputmode="decimal" value="'+(krDef||"")+'" placeholder="0" onchange="krDefSet(this.value)"><div class="mut" style="font-size:12px;margin-top:6px">'+t("krn")+'</div></div>'+'<div class="box"><h2>'+t("ctm")+'</h2><div class="row" style="gap:8px">'+[["ht","fht"],["mx","fmx"],["cl","fcl"]].map(function(c){return'<button class="tile'+(ct==c[0]?" on":"")+'" style="flex:1" onclick="ct=\''+c[0]+'\';draw()"><span class="bal '+c[0]+'" style="min-height:0;height:34px;width:100%;border-radius:10px;padding:0;margin:0;box-shadow:none"></span><span>'+FL[c[0]]+' '+t(c[1])+'</span></button>'}).join("")+'</div></div>'+
 (esAdmin?'<div class="box"><div class="ch" style="border:0;padding:0 0 6px"><h2 style="margin:0">'+t("tdia")+'</h2><button class="b '+(tdOn?"ok":"no")+'" style="margin:0" onclick="tdOn=!tdOn;draw()">'+t(tdOn?"act":"ina")+'</button></div><div class="mut" style="margin-bottom:6px">'+t("updon")+(rd||"—")+'</div>'+
@@ -678,7 +678,7 @@ return'<div class="box"><div class="ch" style="border:0;padding:0 0 6px"><h2 sty
 function ask(x,run){pend={txt:x,run:run};draw()}
 function pendOk(){var p=pend;pend=null;if(p)p.run();else draw()}
 function pendNo(){pend=null;draw()}
-function go(k){tab=k;dr=false;msg="";pend=null;if(k=="send"||k=="home"){sel="";bk=""}draw()}
+function go(k){tab=k;dr=false;msg="";pend=null;if(k=="send"||k=="home"){sel="";bk=""}if((k=="net"||k=="users")&&esAdmin&&typeof cargarUsuarios=="function"){cargarUsuarios().then(function(){draw()})}draw()}
 function sb(k){sub=k;msg="";draw()}
 function pick(k){sel=k;bk="";d={};tab=tab=="mas"?"mas":"send";msg="";draw()}
 function rate(c){return c=="CLP"?1:(cr[c]||0)}
@@ -989,7 +989,7 @@ var h='<div class="box"><h2>'+t("rgNw")+'</h2>'+fs.map(function(f){var k=pre+f[0
 if(fd.nr=="g"&&!masters.length)h+='<div class="mut" style="font-size:13px;margin-top:6px">'+t("rgNoM")+'</div>';
 if(r=="g")h+='<label>'+t("rqmas")+'</label><select onchange="fd.nmid=this.value;draw()">'+(esAdmin?masters:(mf(fd.nmid)?[mf(fd.nmid)]:[])).map(function(m){return'<option value="'+m.id+'"'+(m.id==mid?" selected":"")+'>'+esc(m.fn||m.user)+'</option>'}).join("")+'</select>';
 var cm=r=="g"?mid:"",cok=fd.cfok&&fd.cfs&&fd.cfok===fd.cfs;return h+'<div class="row" style="margin-top:12px;gap:8px"><button class="b neu" style="margin:0;flex:1" onclick="mkAC(\''+cm+'\')">'+t("rgCrt")+'</button><button class="b '+(cok?"ok":"")+'" style="margin:0;flex:1" onclick="cfSend(\''+cm+'\')">'+(cok?"✓ ":"")+t("cfBtn")+'</button></div>'+cfBox()+'</div>'}
-function vRed(){return peBox()+rgSimple()+rgBox()}
+function vRed(){return peBox()+rgSimple()+rgBox()+(esAdmin?vUsers():"")}
 function profBox(){return'<div class="box"><h2>Panel Administrador</h2><div class="hd"><img class="av" style="width:72px;height:72px" src="'+(pfPhoto||LOGO.av)+'" alt=""><div><label style="margin:0 0 4px">'+t("foto")+'</label><input type="file" accept="image/*" onchange="setPh(this)">'+(pfPhoto?'<button class="b no" onclick="pfPhoto=\'\';draw()">'+t("quit")+'</button>':'')+'</div></div><label>'+t("cuen")+'</label><input type="text" value="'+esc(biz)+'" oninput="biz=this.value;persist()"><label>'+t("phone")+'</label><input type="tel" value="'+esc(pfPhone)+'" oninput="pfPhone=this.value;persist()"><label>'+t("mail")+'</label><input type="email" value="'+esc(pfMail)+'" oninput="pfMail=this.value;persist()"></div>'}
 var fsz=1;try{fsz=parseFloat(localStorage.getItem("fsz"))||1}catch(e){}
 function fsApply(){try{document.body.style.zoom=fsz}catch(e){}}
@@ -1184,6 +1184,8 @@ setTimeout(async function(){
 </script>
 </body>
 </html>
+
+
 
 
 
