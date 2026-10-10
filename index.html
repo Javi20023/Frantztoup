@@ -589,6 +589,9 @@ mired:["Rezo mwen","Mis agencias","Mes agences","My agencies","我的网点","As
 pmas:["Panel Mèt Ajans","Panel Master agencia","Panneau Master agence","Master agency panel","总代理面板","Painel Master agência"],
 salg:["Balans jeneral","Saldo general","Solde général","General balance","总余额","Saldo geral"],
 act_re:["Aktivite resan","Actividad reciente","Activité récente","Recent activity","最近活动","Atividade recente"],
+uexists:["Kont sa a deja egziste.","Esta cuenta ya está registrada.","Ce compte existe déjà.","This account already exists.","该账户已存在。","Esta conta já existe."],
+enoconf:["Konfime imèl ou anvan ou konekte (tcheke bwat resepsyon ou).","Confirmá tu correo antes de iniciar sesión (revisá la bandeja de entrada y el spam).","Confirmez votre e-mail avant de vous connecter (vérifiez votre boîte de réception).","Confirm your email before signing in (check your inbox).","登录前请先验证您的邮箱（请查收收件箱）。","Confirme seu e-mail antes de entrar (verifique sua caixa de entrada)."],
+err_limit:["Twòp tantativ. Rete tann yon ti moman.","Demasiados intentos. Esperá unos minutos e intentá de nuevo.","Trop de tentatives. Patientez quelques minutes et réessayez.","Too many attempts. Wait a few minutes and try again.","尝试次数过多，请稍后再试。","Muitas tentativas. Aguarde alguns minutos e tente novamente."],
 };
 var SV={
 moncash:{n:"MonCash",c:"#d62839",g:"M",cur:"HTG",fx:131,cm:2,f:["name","phone","amt"]},
@@ -1041,16 +1044,29 @@ async function forgot(){
   draw()
 }
 async function out(){dr=false;msg="";if(sb)try{await sb.auth.signOut()}catch(e){}sesion=null;esAdmin=false;tab="home";draw()}
-async function unl(){if(!sb){msg="No se pudo conectar con Supabase. Revisá la conexión a internet.";draw();return}
+async function unl(){if(!sb){console.error("unl> supabase no disponible");msg="No se pudo conectar con Supabase. Revisá tu conexión a internet y recargá la página.";draw();return}
 var em=document.getElementById("lem"),pw=document.getElementById("lp");
 var e=em?em.value.trim():"",p=pw?pw.value:"";
 if(!e||!p){msg=t("ncam");draw();return}
 msg=t("load");draw();
 var email=e;
-if(e.indexOf("@")<0){try{var qr=await sb.rpc("email_por_usuario",{uname:e});if(qr.error||!qr.data){msg=t("err_up");draw();return}email=qr.data}catch(err){msg=t("err_up");draw();return}}
-var r=await sb.auth.signInWithPassword({email:email,password:p});
-if(r.error){msg=t("err_up");draw();return}
-sesion=r.data.session;msg="";await cargarRol();draw()}
+try{
+  if(e.indexOf("@")<0){var qr=await sb.rpc("email_por_usuario",{uname:e});if(qr.error||!qr.data){console.error("unl> rpc email_por_usuario",qr.error||"sin datos");msg=t("err_up");draw();return}email=qr.data}
+  var r=await sb.auth.signInWithPassword({email:email,password:p});
+  if(r.error){console.error("unl> signInWithPassword error",r.error);msg=regErr(r.error);draw();return}
+  sesion=r.data.session;msg="";await cargarRol();draw()
+}catch(err){console.error("unl> excepcion",err);msg=regErr(err);draw()}}
+function regErr(e){
+var m=e?(e.message||e.msg||e.error_description||""):"";
+var c=e&&e.code?String(e.code):"";
+var l=String(m).toLowerCase();
+if(l.indexOf("password")>=0&&(l.indexOf("short")>=0||l.indexOf("min")>=0||l.indexOf("weak")>=0||l.indexOf("valid")>=0||l.indexOf("at least")>=0||l.indexOf("character")>=0))return t("npmin")+(m?" ("+m+")":"");
+if(c.indexOf("user_already_exists")>=0||l.indexOf("already")>=0||l.indexOf("exists")>=0)return t("uexists")+(m?" ("+m+")":"");
+if(l.indexOf("not confirmed")>=0||(l.indexOf("confirm")>=0&&l.indexOf("email")>=0))return t("enoconf")+(m?" ("+m+")":"");
+if(c.indexOf("rate")>=0||l.indexOf("rate limit")>=0)return t("err_limit")+(m?" ("+m+")":"");
+return (c?c+": ":"")+m||t("fncerr");
+}
+var authBusy=false;
 function authSet(k){authTab=k;msg="";draw()}
 async function authReg(){
   var a=document.getElementById("rem"),b=document.getElementById("rp"),c=document.getElementById("rp2"),f=document.getElementById("rfn"),u=document.getElementById("run");
@@ -1059,14 +1075,18 @@ async function authReg(){
   if(un.length<3){msg=t("umin");draw();return}
   if(p.length<6){msg=t("npmin");draw();return}
   if(p!==cf){msg=t("e_cf");draw();return}
-  if(!sb){msg="";draw();return}
+  if(!sb){console.error("authReg> supabase no disponible");msg="No se pudo conectar con Supabase. Revisá tu conexión a internet y recargá la página.";draw();return}
+  if(authBusy){console.warn("authReg> omitido, ya en curso");return}authBusy=true;
   msg=t("load");draw();
   try{
     var r=await sb.auth.signUp({email:e,password:p,options:{data:{full_name:fn,username:un}}});
-    if(r.error){msg=fErr(r.error);draw();return}
-    if(r.data&&r.data.session){sesion=r.data.session;msg="";await cargarRol();tab="home";draw();return}
-    msg=t("regok");authTab="login";draw()
-  }catch(err){msg=fErr(err);draw()}
+    if(r.error){console.error("authReg> signUp devolvio error",r.error);msg=regErr(r.error)}
+    else if(r.data&&r.data.session){console.log("authReg> cuenta creada con sesion activa",r.data.user&&r.data.user.id);sesion=r.data.session;msg="";await cargarRol();tab="home"}
+    else if(r.data&&r.data.user){console.log("authReg> cuenta creada; confirmacion de correo requerida",r.data.user.id);msg=t("regok");authTab="login"}
+    else{console.error("authReg> respuesta inesperada de signUp",r);msg=regErr(new Error("Respuesta inesperada de Supabase."))}
+    draw()
+  }catch(err){console.error("authReg> excepcion",err);msg=regErr(err);draw()}
+  authBusy=false;
 }
 function lockHtml(){
 if(!sb)return'<div class="box" style="max-width:400px"><h2>'+t("padm")+'</h2><p role="status"><b>No se pudo conectar con Supabase. Revisá tu conexión a internet y recargá la página.</b></p></div>';
@@ -1164,4 +1184,5 @@ setTimeout(async function(){
 </script>
 </body>
 </html>
+
 
