@@ -790,6 +790,7 @@ function docOpen(id,k){var o=find(id);if(!o)return;try{pvS={id:id,k:k,u:card(o,k
 function pvClose(){pvS=null;draw()}
 function pvHtml(){if(!pvS)return"";var id=pvS.id,k=pvS.k,ot=k=="f"?"c":"f",ic=function(d){return'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>'},bt=function(f,l,d,pr){return'<button class="b'+(pr?'':' neu')+'" style="margin:0;display:flex;gap:10px;align-items:center'+(pr?';background:#1d4fd7;color:#fff':'')+'" onclick="act(\''+id+'\',\''+f+'\',\''+k+'\')">'+ic(d)+l+'</button>'};
 return'<div role="dialog" aria-modal="true" style="position:fixed;left:0;top:0;right:0;bottom:0;z-index:60;background:var(--bg,#f6f8fb);overflow:auto;padding:14px"><div style="max-width:520px;margin:0 auto"><button class="b neu" style="margin:0 0 12px;display:flex;gap:10px;align-items:center" onclick="pvClose()">'+ic('<path d="M19 12H5M12 19l-7-7 7-7"/>')+t("pvback")+'</button>'+(msg?'<div class="box" role="status"><b>'+esc(msg)+'</b></div>':'')+'<div class="row" style="flex-wrap:wrap;gap:10px;margin-bottom:12px">'+bt("pdf","PDF",'<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>')+bt("img",t("pvimg"),'<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.5"/><path d="M21 15l-5-5L5 21"/>')+bt("share",t("pvshr"),'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>')+bt("print",t("pvprn"),'<path d="M6 9V3h12v6M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><rect x="6" y="14" width="12" height="7" rx="1"/>',1)+'<button class="b neu" style="margin:0" onclick="docOpen(\''+id+'\',\''+ot+'\')">'+t(ot=="f"?"fac":"cmp")+'</button></div><img alt="" src="'+pvS.u+'" style="display:block;width:100%;background:#fff;border-radius:24px;box-shadow:0 4px 14px rgba(0,0,0,.08)"></div></div>'}
+var dlFallback={save:async function(o){var bl=o.data instanceof Blob?o.data:new Blob([o.data]),u=URL.createObjectURL(bl),a=document.createElement("a");a.href=u;a.download=o.filename;a.style.display="none";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000)}};
 async function act(id,f,kd){var o=find(id),k=kd||o.dk||"c",fa=k=="f",nm=(fa?"factura-":"comprobante-")+o.n,B=o.bk?BK[o.bk]:SV[o.s];
 try{
 if(f=="print"){document.getElementById("pr").innerHTML='<img alt="" src="'+card(o,k).toDataURL("image/png")+'" style="display:block;margin:0 auto;width:'+(fa?"150mm":"90mm")+';max-width:100%">';window.print();return}
@@ -797,7 +798,7 @@ var b=await blob(o,k);
 if(f=="share"){var fl=new File([b],nm+".png",{type:"image/png"}),tx=rowsOf(o,L).map(function(p){return p[0]+": "+p[1]}).join("\n");
 if(navigator.canShare&&navigator.canShare({files:[fl]})){await navigator.share({files:[fl],text:tx});return}
 var w=window.open("https://wa.me/?text="+encodeURIComponent(tx),"_blank");if(!w){msg=t("nodl");draw()}return}
-var D=window.claude&&await claude.use("downloads");if(!D){msg=t("nodl");draw();return}
+var D=window.claude&&await claude.use("downloads");if(!D)D=dlFallback;
 if(f=="img"){await D.save({filename:nm+".png",data:b});return}
 var J=window.jspdf&&window.jspdf.jsPDF;if(!J){msg=t("nodl");draw();return}
 var cv=card(o,k),cw=cv.width,ch=cv.height,im2=cv.toDataURL("image/png"),doc;
@@ -847,7 +848,7 @@ function hSet(k){hf=k;draw()}
 function hCsv(){var l=hList(),q=function(x){return'"'+String(x==null?"":x).replace(/"/g,'""')+'"'};var c=["#","Date","Type","Detail","Amount","Status"].map(q).join(",")+"\n"+l.map(function(e){return[e.n,e.d||"",HT[e.ty]?t(HT[e.ty]):e.ty,e.lb,e.tx,e.st=="x"?t("cnld"):"OK"].map(q).join(",")}).join("\n");return c}
 async function hAct(f){var l=hList();if(!l.length){msg=t("empty");draw();return}try{
 if(f=="print"){document.getElementById("pr").innerHTML='<h2 style="font-family:sans-serif">'+esc(biz)+' · '+t("hist")+'</h2><table style="width:100%;border-collapse:collapse;font:12px sans-serif">'+l.map(function(e){return'<tr><td style="border-bottom:1px solid #ccc;padding:4px">'+esc(e.d||"")+'</td><td style="border-bottom:1px solid #ccc;padding:4px">'+esc(HT[e.ty]?t(HT[e.ty]):e.ty)+'</td><td style="border-bottom:1px solid #ccc;padding:4px">'+esc(e.lb)+'</td><td style="border-bottom:1px solid #ccc;padding:4px;text-align:right">'+esc(e.tx)+(e.st=="x"?" ("+esc(t("cnld"))+")":"")+'</td></tr>'}).join("")+'</table>';window.print();return}
-var D=window.claude&&await claude.use("downloads");if(!D){msg=t("nodl");draw();return}
+var D=window.claude&&await claude.use("downloads");if(!D)D=dlFallback;
 await D.save({filename:"historial-"+new Date().toISOString().slice(0,10)+".csv",data:new Blob(["﻿"+hCsv()],{type:"text/csv"})})}
 catch(e){if(!e||(e.code!="declined"&&e.name!="AbortError")){msg=t("nodl");draw()}}}
 function vAll(){var l=hList(),all=log.length,ty=["all","op","rc","rt","dep","rf","tr"],cnt=function(k){return k=="all"?all:log.filter(function(e){return e.ty==k}).length},tot=l.reduce(function(s,e){return s+(e.st=="x"?0:(+e.amt||0))},0);
@@ -1012,7 +1013,7 @@ async function phAct(f){if(!phU)return;try{
 if(f=="print"){document.getElementById("pr").innerHTML='<img alt="" src="'+phU+'" style="display:block;margin:0 auto;max-width:100%;max-height:270mm">';window.print();return}
 var b=phBlob(),ext=(b.type.split("/")[1]||"png").replace("jpeg","jpg").replace(/\+.*/,""),nm=(phN||"imagen").replace(/\.[^.]+$/,"")||"imagen";
 if(f=="share"){var fl=new File([b],nm+"."+ext,{type:b.type});if(navigator.canShare&&navigator.canShare({files:[fl]})){await navigator.share({files:[fl]});return}msg=t("nodl");draw();return}
-var D=window.claude&&await claude.use("downloads");if(!D){msg=t("nodl");draw();return}
+var D=window.claude&&await claude.use("downloads");if(!D)D=dlFallback;
 if(f=="img"){await D.save({filename:nm+"."+ext,data:b});return}
 var J=window.jspdf&&window.jspdf.jsPDF;if(!J){msg=t("nodl");draw();return}
 var im=await new Promise(function(ok,ko){var i=new Image();i.onload=function(){ok(i)};i.onerror=ko;i.src=phU}),cv=document.createElement("canvas");cv.width=im.width;cv.height=im.height;var cx=cv.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0);
@@ -1184,6 +1185,7 @@ setTimeout(async function(){
 </script>
 </body>
 </html>
+
 
 
 
