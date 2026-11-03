@@ -132,7 +132,7 @@ var SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZi
 var sb=null;
 try{if(window.supabase&&window.supabase.createClient){var sess=window.sessionStorage;sb=window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:sess,persistSession:true,autoRefreshToken:true}})}else{sb=null}}catch(e){sb=null}
 var sesion=null,esAdmin=false,myRol="";
-function allow(k){if(k=="users")return false;if(k=="deu"||k=="ag")return esAdmin;if(k=="net")return esAdmin||myRol=="master";if(k=="mov")return esAdmin||myRol=="master";if(k=="not"||k=="fac")return myRol!="master";return true}
+function allow(k){if(k=="users")return false;if(k=="dev"||k=="rpt")return esAdmin;if(k=="deu"||k=="ag")return esAdmin;if(k=="net")return esAdmin||myRol=="master";if(k=="mov")return esAdmin||myRol=="master";if(k=="not"||k=="fac")return myRol!="master";return true}
 function redKey(){return myRol=="master"?"mired":"redn"}
 function panelName(){return esAdmin?t("padm"):t("pmas")}
 function rolName(){return myRol=="admin"?t("rolad"):t("rolmas")}
@@ -182,7 +182,7 @@ var r=await sb.auth.updateUser({password:np});
 if(r.error){msg=t("fncerr")+r.error.message;draw();return}
 if(a)a.value="";if(b)b.value="";if(c)c.value="";
 msg=t("pass_ok");draw()}
-function vSec(){if(!sesion)return'<div class="box"><h2>'+t("segur")+'</h2></div>';
+function vSecAccount(){if(!sesion)return'<div class="box"><h2>'+t("segur")+'</h2></div>';
 return'<div class="box"><h2>'+t("segur")+'</h2>'
 +'<div class="ln"><span class="mut">'+t("correo")+'</span><span>'+esc(sesion.user.email)+'</span></div>'
 +'<div class="ln"><span class="mut">'+t("rolu")+'</span><span>'+rolName()+'</span></div>'
@@ -645,6 +645,87 @@ uexists:["Kont sa a deja egziste.","Esta cuenta ya está registrada.","Ce compte
 enoconf:["Konfime imèl ou anvan ou konekte (tcheke bwat resepsyon ou).","Confirmá tu correo antes de iniciar sesión (revisá la bandeja de entrada y el spam).","Confirmez votre e-mail avant de vous connecter (vérifiez votre boîte de réception).","Confirm your email before signing in (check your inbox).","登录前请先验证您的邮箱（请查收收件箱）。","Confirme seu e-mail antes de entrar (verifique sua caixa de entrada)."],
 err_limit:["Twòp tantativ. Rete tann yon ti moman.","Demasiados intentos. Esperá unos minutos e intentá de nuevo.","Trop de tentatives. Patientez quelques minutes et réessayez.","Too many attempts. Wait a few minutes and try again.","尝试次数过多，请稍后再试。","Muitas tentativas. Aguarde alguns minutos e tente novamente."],
 };
+/* i18n Fase 2 (dev / reportes / seguridad). Fallback a español en ht, zh y pt. */
+var EXT=(function(){
+  function K(es,fr,en){return[fr||es,es,fr||es,en||es,es,es]}
+  return {
+    devT:K("Panel de desarrollo","Panneau de développement","Development panel"),
+    devCli:K("Clientes","Clients","Clients"),
+    devActive:K("Activos","Actifs","Active"),
+    devCompany:K("Empresa","Entreprise","Company"),
+    devConfirmDel:K("¿Eliminar este cliente?","Supprimer ce client ?","Delete this client?"),
+    devEmpty:K("Sin clientes. Crea el primero.","Aucun client. Créez le premier.","No clients yet. Create the first one."),
+    devInsufficient:K("Saldo insuficiente del cliente","Solde insuffisant du client","Client balance is insufficient"),
+    devNoFunds:K("Saldo insuficiente en el panel","Solde insuffisant dans le panneau","Insufficient panel balance"),
+    devNote:K("Nota","Note","Note"),
+    devPanel:K("Cuenta de cliente","Compte client","Client account"),
+    devRate:K("Tasa","Taux","Rate"),
+    devRateBad:K("Tasa no configurada para esta moneda","Taux non configuré pour cette devise","No rate configured for this currency"),
+    devSale:K("Vender servicio","Vendre un service","Sell service"),
+    devSaved:K("Guardado","Enregistré","Saved"),
+    devSince:K("Cliente desde","Client depuis","Client since"),
+    devWallet:K("Billetera","Portefeuille","Wallet"),
+    devWallet1:K("MonCash · NatCash · TopUp","MonCash · NatCash · TopUp","MonCash · NatCash · TopUp"),
+    devWallet2:K("Nequi · Yape · Zelle · Depo · Pix","Nequi · Yape · Zelle · Depo · Pix","Nequi · Yape · Zelle · Depo · Pix"),
+    devBlockHint:K("Un cliente bloqueado no puede recibir retiros ni compras hasta desbloquearlo.","Un client bloqué ne peut pas recevoir de retraits ni d'achats tant qu'il n'est pas débloqué.","A blocked client cannot withdraw or purchase until unblocked."),
+
+    rptT:K("Reportes","Rapports","Reports"),
+    rptBal:K("Saldo","Solde","Balance"),
+    rptBill:K("Facturación","Facturation","Billing"),
+    rptClear:K("Limpiar filtros","Effacer les filtres","Clear filters"),
+    rptCount:K("movimientos","mouvements","movements"),
+    rptDate:K("Fecha","Date","Date"),
+    rptDetail:K("Detalle","Détail","Detail"),
+    rptFrom:K("Desde","Du","From"),
+    rptTo:K("Hasta","Au","To"),
+    rptNo:K("Sin resultados","Aucun résultat","No results"),
+    rptQuery:K("Buscar cliente, servicio o referencia","Rechercher client, service ou référence","Search client, service or reference"),
+    rptRank:K("Ranking de clientes","Classement des clients","Client ranking"),
+    rptRec:K("Recargas","Recharges","Top-ups"),
+    rptRet:K("Retiros","Retraits","Withdrawals"),
+    rptSold:K("Vendido","Vendu","Sold"),
+    rptType:K("Tipo","Type","Type"),
+
+    secAccount:K("Cuenta","Compte","Account"),
+    secSession:K("Sesión","Session","Session"),
+    secLast:K("Último acceso","Dernier accès","Last sign-in"),
+    secSync:K("Sincronización con Supabase","Synchronisation avec Supabase","Supabase sync"),
+    secAccess:K("Accesos","Accès","Access"),
+    secAlerts:K("Alertas","Alertes","Alerts"),
+    secAudit:K("Auditoría","Audit","Audit"),
+    secCheck:K("Verificación","Vérification","Checklist"),
+    secClients:K("Clientes de desarrollo","Clients de développement","Development clients"),
+    secClearLog:K("Borrar historial","Effacer l'historique","Clear history"),
+    secConfirmClear:K("¿Borrar el historial de auditoría?","Effacer l'historique d'audit ?","Clear the audit history?"),
+    secNoEvents:K("Sin eventos","Aucun événement","No events"),
+    secSessOk:K("Sesión autenticada","Session authentifiée","Authenticated session"),
+    sec2fa:K("Verificación en dos pasos","Vérification en deux étapes","Two-step verification"),
+    sec2faHint:K("Se configura desde Supabase Auth (MFA). Esta app no guarda secretos TOTP.","Se configure depuis Supabase Auth (MFA). Cette application ne stocke pas de secrets TOTP.","Configure it in Supabase Auth (MFA). This app does not store TOTP secrets."),
+
+    secPin:K("PIN","PIN","PIN"),
+    secPinSet:K("Guardar PIN","Enregistrer le PIN","Save PIN"),
+    secPinCur:K("PIN actual","PIN actuel","Current PIN"),
+    secPinNew:K("PIN nuevo","Nouveau PIN","New PIN"),
+    secPinOk:K("PIN actualizado","PIN mis à jour","PIN updated"),
+    secPinBad:K("PIN incorrecto","PIN incorrect","Incorrect PIN"),
+    secPinFmt:K("El PIN debe tener de 4 a 8 dígitos","Le PIN doit comporter de 4 à 8 chiffres","The PIN must be 4 to 8 digits"),
+    secPinReq:K("Escribe el PIN para continuar","Saisissez le PIN pour continuer","Enter the PIN to continue"),
+    secPinOff:K("Desactivar PIN","Désactiver le PIN","Disable PIN"),
+    secPinOff2:K("Desactivado","Désactivé","Disabled"),
+    secPinOn:K("PIN activo","PIN actif","PIN active"),
+    secPinHint:K("Protege recargas y retiros del panel de desarrollo.","Protège les recharges et retraits du panneau de développement.","Protects top-ups and withdrawals in the development panel."),
+    secStatus:K("Estado","Statut","Status"),
+
+    secLimits:K("Límites","Limites","Limits"),
+    secLimitNote:K("0 = sin límite","0 = sans limite","0 = no limit"),
+    secLimitRc:K("Máximo por recarga (CLP)","Maximum par recharge (CLP)","Maximum per top-up (CLP)"),
+    secLimitRt:K("Máximo por retiro (CLP)","Maximum par retrait (CLP)","Maximum per withdrawal (CLP)"),
+    secLimitDay:K("Máximo diario en retiros (CLP)","Maximum quotidien en retraits (CLP)","Daily withdrawal maximum (CLP)"),
+    secLimHit:K("La operación excede el límite configurado","L'opération dépasse la limite configurée","The operation exceeds the configured limit")
+  };
+})();
+Object.keys(EXT).forEach(function(k){if(!I[k])I[k]=EXT[k]});
+
 var SV={
 moncash:{n:"MonCash",c:"#d62839",g:"M",cur:"HTG",fx:131,cm:2,f:["name","phone","amt"]},
 natcash:{n:"NatCash",c:"#f26a21",g:"N",cur:"HTG",fx:131,cm:2,f:["name","phone","amt"]},
@@ -657,7 +738,7 @@ pix:{n:"Pix Brasil",c:"#1fa99a",g:"P",cur:"BRL",fx:5.4,cm:2,f:["name","phone","a
 var BK={sogebank:{n:"Sogebank",c:"#0b5ea8",g:"S"},unibank:{n:"Unibank",c:"#00843d",g:"U"},capital:{n:"Capital Bank",c:"#b01c2e",g:"C"},rut:{n:"Cuenta RUT",c:"#ff6a13",g:"R",bank:"BancoEstado"},mx:{n:"México",c:"#006847",g:"MX",bank:"México"}};
 var OP=["Digicel","Natcom","Claro","Movistar","Tigo","Entel","Bitel","Vivo","TIM","Orange"];
 var ct="ht",FL={ht:"🇭🇹",mx:"🇲🇽",cl:"🇨🇱"};
-var ORD=["topup","moncash","natcash","zelle","nequi","yape","pix","depo"],SUB={topup:"s_top",moncash:"s_wal",natcash:"s_wal"},LCL=["fr","es","fr","en","zh","pt"],PT={home:"inicio",deu:"deuT",not:"ntT",send:"envio",fac:"facT",ops:"ops",mov:"mov",net:"redn",prof:"perfil",all:"hist",sec:"segur",ag:"pag",sup:"soporte",users:"usrT",reset:"pwcam"};
+var ORD=["topup","moncash","natcash","zelle","nequi","yape","pix","depo"],SUB={topup:"s_top",moncash:"s_wal",natcash:"s_wal"},LCL=["fr","es","fr","en","zh","pt"],PT={home:"inicio",deu:"deuT",not:"ntT",send:"envio",fac:"facT",ops:"ops",mov:"mov",net:"redn",prof:"perfil",all:"hist",sec:"segur",ag:"pag",sup:"soporte",users:"usrT",reset:"pwcam",dev:"devT",rpt:"rptT"};
 var IM={};Object.keys(LOGO).forEach(function(k){var i=new Image();i.src=LOGO[k];IM[k]=i});
 function accOf(v){if(v=="a"||v=="v"||v=="x")return null;var p=v.split(":"),m=masters.filter(function(x){return x.id==p[1]})[0];if(!m)return null;if(p[0]=="m")return m;return m.ags.filter(function(g){return g.id==p[2]})[0]||null}
 function bal(){var e=ef(srcv);if(isX(e))return xB(e);var a=accOf(srcv);return a?a.saldo:virt}
@@ -1183,8 +1264,524 @@ function ftPw(id,btn){var i=document.getElementById(id);if(!i||!btn)return;var s
 function fwShow(n){try{var im=document.querySelectorAll("#fw-hero img"),dt=document.querySelectorAll("#fw-dots i");fwK=n;for(var i=0;i<im.length;i++)im[i].classList.toggle("on",i===n);for(var j=0;j<dt.length;j++)dt[j].classList.toggle("on",j===n)}catch(e){}}
 function fwNext(){var im=document.querySelectorAll("#fw-hero img");if(!im.length)return;fwShow((fwK+1)%im.length)}
 function authAfter(){try{if(fwTm){clearInterval(fwTm);fwTm=null}if(!lock||authTab!="welcome")return;if(!document.querySelector("#fw-hero img"))return;fwShow(0);fwTm=setInterval(fwNext,4500)}catch(e){}}
+/* ==========================================================================
+   FASE 2 — Panel de desarrollo, Reportes y Seguridad
+   Estado persistido en Supabase: panel_state.data.dev / panel_state.data.sec
+   ========================================================================== */
+var dev={c:[],n:0},sec={pin:"",aud:[],al:[],ck:{},lim:{rc:0,rt:0,d:0}};
+var dvTab="ini",dvSel=0,dvFl="all",dvSub="",dvF={};
+var rpD={u:"all",ty:"all",f:"",to:"",q:""};
+var secTab="cuenta";
+
+function dvBoot(){
+  if(!dev||typeof dev!="object")dev={c:[],n:0};
+  if(!Array.isArray(dev.c))dev.c=[];
+  if(!sec||typeof sec!="object")sec={};
+  if(!Array.isArray(sec.aud))sec.aud=[];
+  if(!Array.isArray(sec.al))sec.al=[];
+  if(!sec.ck||typeof sec.ck!="object")sec.ck={};
+  if(!sec.lim||typeof sec.lim!="object")sec.lim={rc:0,rt:0,d:0};
+  if(typeof sec.pin!="string")sec.pin="";
+  dev.c.forEach(function(c){
+    if(!c)return;
+    c.mv=Array.isArray(c.mv)?c.mv:[];
+    c.sv=Array.isArray(c.sv)?c.sv:[];
+    c.sh=+c.sh||0;c.sx=+c.sx||0;c.db=+c.db||0;
+  });
+}
+function dvNow(){return new Date().toISOString().slice(0,16).replace("T"," ")}
+function dvG(id){for(var i=0;i<dev.c.length;i++)if(String(dev.c[i].id)==String(id))return dev.c[i];return null}
+function dvRate(c){var cu=(c&&c.cu)||"CLP";if(cu=="CLP")return 1;var r=+cr[cu]||0;return r>0?r:0}
+function dvMn(c,x){x=+x||0;var cu=(c&&c.cu)||"CLP",r=dvRate(c);if(cu!="CLP"&&r>0)return nf(Math.round(x/r*100)/100)+" "+cu;return nf(x)+" CLP"}
+function dvTot(c){return(+c.sh||0)+(+c.sx||0)}
+function dvGrp(k){return(k=="moncash"||k=="natcash"||k=="topup")?"sh":"sx"}
+function dvWn(w){return w=="sx"?t("devWallet2"):t("devWallet1")}
+function dvOk(c,k){return k=="act"?!c.bl:k=="blk"?!!c.bl:k=="deb"?(+c.db||0)>0:true}
+function dvDayOut(){var td=dvNow().slice(0,10),s=0;dev.c.forEach(function(c){(c.mv||[]).forEach(function(m){if(m.ty=="rt"&&String(m.d||"").slice(0,10)==td)s+=+m.a||0})});return s}
+
+function secAud(a,d){
+  sec.aud.unshift({t:dvNow(),a:a||"",d:d||"",u:(sesion&&sesion.user&&sesion.user.email)||""});
+  if(sec.aud.length>300)sec.aud.length=300;
+}
+function secAlert(lv,d){
+  sec.al.unshift({t:dvNow(),lv:lv||0,d:d||""});
+  if(sec.al.length>100)sec.al.length=100;
+}
+
+/* ------------------------------- DESARROLLO ------------------------------- */
+function dvT(k){dvTab=k;dvSub="";msg="";draw();top0()}
+function dvFs(k){dvFl=k;draw()}
+function dvOpen(id){dvSel=+id;dvSub="perf";msg="";draw();top0()}
+function dvSetK(k){dvF.k=k;draw()}
+function dvSetCu(v){dvF.cu=v;draw()}
+
+function dvChips(){
+  var ks=[["all",t("all")],["act",t("devActive")],["blk",t("blkd")],["deb",t("debt")]];
+  return '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px">'+ks.map(function(x){
+    var n=dev.c.filter(function(c){return dvOk(c,x[0])}).length,on=dvFl==x[0];
+    return '<button class="b '+(on?"ok":"neu")+'" style="margin:0;padding:6px 12px;font-size:13px;border-radius:99px" onclick="dvFs(\''+x[0]+'\')">'+x[1]+' · '+n+'</button>';
+  }).join("")+'</div>';
+}
+
+function dvCard(c){
+  var st=c.bl?'<span class="actb" style="background:rgba(220,38,38,.12);color:var(--red)">'+t("blkd")+'</span>':'<span class="actb">'+t("devActive")+'</span>';
+  return '<div class="box" style="margin-top:10px;padding:12px">'
+    +'<div class="row" style="gap:8px;align-items:center">'
+    +'<span class="lb" style="width:38px;height:38px;border-radius:50%;flex:none;font-weight:800">'+esc(String(c.n||"?").charAt(0).toUpperCase())+'</span>'
+    +'<b style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">'+esc(c.n||"")+'</b>'+st+'</div>'
+    +((c.co||c.ph)?'<div class="mut" style="font-size:12px">'+esc([c.co,c.ph].filter(Boolean).join(" · "))+'</div>':'')
+    +'<div class="ln"><span class="mut">'+t("devWallet1")+'</span><b>'+dvMn(c,c.sh)+'</b></div>'
+    +'<div class="ln"><span class="mut">'+t("devWallet2")+'</span><b>'+dvMn(c,c.sx)+'</b></div>'
+    +((+c.db||0)>0?'<div class="ln"><span class="mut">'+t("debt")+'</span><b style="color:var(--red)">'+dvMn(c,c.db)+'</b></div>':'')
+    +'<button class="b neu" style="width:100%;margin:8px 0 0" onclick="dvOpen('+c.id+')">'+t("devPanel")+'</button></div>';
+}
+
+function dvList(){
+  var l=dev.c.filter(function(c){return dvOk(c,dvFl)});
+  return dvChips()+(l.length?l.map(dvCard).join(""):'<div class="empty">'+t("devEmpty")+'</div>');
+}
+
+function dvHome(){
+  var n=dev.c.length,bl=dev.c.filter(function(c){return c.bl}).length,
+      sh=dev.c.reduce(function(a,c){return a+(+c.sh||0)},0),
+      sx=dev.c.reduce(function(a,c){return a+(+c.sx||0)},0),
+      db=dev.c.reduce(function(a,c){return a+(+c.db||0)},0);
+  var rec=[];dev.c.forEach(function(c){(c.mv||[]).slice(0,6).forEach(function(m){rec.push({c:c,m:m})})});
+  rec.sort(function(a,b){return String(b.m.d).localeCompare(String(a.m.d))});
+  return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">'
+    +'<div class="box" style="margin:0;padding:12px"><div class="mut" style="font-size:12px">'+t("devCli")+'</div><b style="font-size:22px">'+n+'</b></div>'
+    +'<div class="box" style="margin:0;padding:12px"><div class="mut" style="font-size:12px">'+t("serv")+'</div><b style="font-size:22px">'+ORD.length+'</b></div></div>'
+    +'<div class="grid" style="grid-template-columns:1fr 1fr"><button class="tile" onclick="dvT(\'usr\')"><span style="color:var(--blue)">'+ic("dev",28)+'</span><span>'+t("devCli")+'</span></button><button class="tile" onclick="dvT(\'pnl\')"><span style="color:var(--blue)">'+ic("mas",28)+'</span><span>'+t("devPanel")+'</span></button></div>'
+    +'<div class="box"><div class="mut" style="font-size:12px;margin-bottom:6px">'+t("tot")+'</div>'
+    +'<div class="ln"><span class="mut">'+t("devWallet1")+'</span><b>'+nf(sh)+' CLP</b></div>'
+    +'<div class="ln"><span class="mut">'+t("devWallet2")+'</span><b>'+nf(sx)+' CLP</b></div>'
+    +'<div class="ln"><span class="mut">'+t("debt")+'</span><b style="color:var(--red)">'+nf(db)+' CLP</b></div>'
+    +'<div class="ln"><span class="mut">'+t("blkd")+'</span><b>'+bl+'</b></div></div>'
+    +'<div class="box"><h2>'+t("act_re")+'</h2>'+(rec.length?rec.map(function(x){
+        return '<div class="ch"><span style="min-width:0"><b>'+esc(x.c.n||"")+'</b><br><span class="mut" style="font-size:12px">'+esc(x.m.tx||"")+' · '+esc(x.m.d||"")+'</span></span><b style="color:'+(x.m.ty=="rc"?"var(--ok)":"var(--red)")+'">'+(x.m.ty=="rc"?"+":"-")+nf(x.m.a||0)+'</b></div>';
+      }).join(""):'<div class="empty">'+t("empty")+'</div>')+'</div>'
+    +'<div class="mut" style="letter-spacing:.08em;font-size:12px;font-weight:600;margin:14px 0 8px">'+t("devCli").toUpperCase()+'</div>'
+    +dvList();
+}
+
+function dvAddBox(){
+  var g=function(k){return esc(dvF[k]||"")};
+  var cks=["CL","HT","CO","PE","BR","MX","US","ES"];
+  var cus=["CLP","HTG","COP","PEN","BRL","MXN","USD","EUR"];
+  var cn=function(k){return CM[k]?CM[k].n:(CM[k]&&CM[k].n)||k};
+  return '<div class="box"><h2>'+t("add")+' · '+t("devCli")+'</h2>'
+    +'<label>'+t("fnm")+'</label><input type="text" value="'+g("n")+'" oninput="dvF.n=this.value" autocomplete="off">'
+    +'<label>'+t("devCompany")+'</label><input type="text" value="'+g("co")+'" oninput="dvF.co=this.value" autocomplete="off">'
+    +'<label>'+t("cty")+'</label><select onchange="dvSetK(this.value)">'+cks.map(function(k){return '<option value="'+k+'"'+((dvF.k||"CL")==k?" selected":"")+'>'+esc(cn(k))+'</option>'}).join("")+'</select>'
+    +'<label>'+t("phone")+'</label><input type="tel" value="'+g("ph")+'" oninput="dvF.ph=this.value" autocomplete="off">'
+    +'<label>'+t("mail")+'</label><input type="email" value="'+g("em")+'" oninput="dvF.em=this.value" autocomplete="off">'
+    +'<label>'+t("cur")+'</label><select onchange="dvSetCu(this.value)">'+cus.map(function(k){return '<option value="'+k+'"'+((dvF.cu||"CLP")==k?" selected":"")+'>'+k+'</option>'}).join("")+'</select>'
+    +'<button class="b ok" style="width:100%;margin:14px 0 0" onclick="dvMk()">'+t("add")+'</button></div>';
+}
+
+function dvMk(){
+  var n=String(dvF.n||"").trim(),co=String(dvF.co||"").trim(),ph=String(dvF.ph||"").trim(),
+      em=String(dvF.em||"").trim().toLowerCase(),k=dvF.k||"CL",cu=dvF.cu||"CLP";
+  if(!n){msg=t("err1");draw();top0();return}
+  if(em&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){msg=t("e_mail");draw();top0();return}
+  dev.n=(dev.n||0)+1;
+  var c={id:Date.now()+dev.n,n:n,co:co,ph:ph,em:em,k:k,cu:cu,sh:0,sx:0,db:0,bl:0,sv:ORD.slice(),mv:[],d:dvNow()};
+  dev.c.unshift(c);
+  secAud("Cliente creado",n);
+  dvF={};dvSel=c.id;dvTab="pnl";dvSub="perf";
+  msg=t("devSaved");persist();draw();top0();
+}
+
+function dvHead(c){
+  return '<div class="box cc" style="padding:14px"><div class="row" style="gap:10px;align-items:center">'
+    +'<span class="lb" style="width:46px;height:46px;border-radius:50%;flex:none;font-weight:800;font-size:19px">'+esc(String(c.n||"?").charAt(0).toUpperCase())+'</span>'
+    +'<div style="flex:1;min-width:0"><b style="font-size:17px">'+esc(c.n||"")+'</b><br><span class="mut" style="font-size:12px">'+esc([c.co,c.k,c.cu].filter(Boolean).join(" · "))+'</span></div>'
+    +(c.bl?'<span class="actb" style="background:rgba(220,38,38,.12);color:var(--red)">'+t("blkd")+'</span>':'')
+    +'</div><div class="ln" style="margin-top:8px"><span class="mut">'+t("devWallet1")+'</span><b>'+dvMn(c,c.sh)+'</b></div>'
+    +'<div class="ln"><span class="mut">'+t("devWallet2")+'</span><b>'+dvMn(c,c.sx)+'</b></div>'
+    +((+c.db||0)>0?'<div class="ln"><span class="mut">'+t("debt")+'</span><b style="color:var(--red)">'+dvMn(c,c.db)+'</b></div>':'')
+    +'</div>';
+}
+
+function dvPanel(){
+  var c=dvG(dvSel)||dev.c[0];
+  if(!c)return '<div class="empty">'+t("devEmpty")+'</div>';
+  dvSel=c.id;
+  var sel='<select onchange="dvSel=+this.value;dvSub=\'\';draw();top0()">'+dev.c.map(function(x){return '<option value="'+x.id+'"'+(x.id==c.id?" selected":"")+'>'+esc(x.n||"")+'</option>'}).join("")+'</select>';
+  var tabs=[["perf",t("perfil")],["ops",t("ops")],["mov",t("mov")],["svc",t("serv")],["cfg",t("segur")]];
+  var h='<div class="seg" style="margin:0 0 12px">'+tabs.map(function(x){return '<button class="'+((dvSub||"perf")==x[0]?"on":"")+'" onclick="dvSub=\''+x[0]+'\';msg=\'\';draw();top0()">'+x[1]+'</button>'}).join("")+'</div>';
+  var body=dvSub=="ops"?dvOps(c):dvSub=="mov"?dvMov(c):dvSub=="svc"?dvSvc(c):dvSub=="cfg"?dvCfg(c):dvPerf(c);
+  return sel+dvHead(c)+h+body;
+}
+
+function dvPerf(c){
+  var cks=["CL","HT","CO","PE","BR","MX","US","ES"];
+  var cus=["CLP","HTG","COP","PEN","BRL","MXN","USD","EUR"];
+  var cn=function(k){return (CM[k]&&CM[k].n)||k};
+  return '<div class="box"><h2>'+t("perfil")+'</h2>'
+    +'<label>'+t("fnm")+'</label><input id="dpn" type="text" value="'+esc(c.n||"")+'" autocomplete="off">'
+    +'<label>'+t("devCompany")+'</label><input id="dpc" type="text" value="'+esc(c.co||"")+'" autocomplete="off">'
+    +'<label>'+t("phone")+'</label><input id="dpp" type="tel" value="'+esc(c.ph||"")+'" autocomplete="off">'
+    +'<label>'+t("mail")+'</label><input id="dpe" type="email" value="'+esc(c.em||"")+'" autocomplete="off">'
+    +'<label>'+t("cty")+'</label><select id="dpk">'+cks.map(function(k){return '<option value="'+k+'"'+(c.k==k?" selected":"")+'>'+esc(cn(k))+'</option>'}).join("")+'</select>'
+    +'<label>'+t("cur")+'</label><select id="dpcu">'+cus.map(function(k){return '<option value="'+k+'"'+(c.cu==k?" selected":"")+'>'+k+'</option>'}).join("")+'</select>'
+    +'<button class="b ok" style="width:100%;margin:14px 0 0" onclick="dvSave('+c.id+')">'+t("save")+'</button>'
+    +'<div class="mut" style="font-size:12px;margin-top:8px">'+t("devSince")+': '+esc(c.d||"—")+'</div></div>';
+}
+
+function dvSave(id){
+  var c=dvG(id);if(!c)return;
+  var g=function(x){var e=document.getElementById(x);return e?String(e.value||""):""};
+  var n=g("dpn").trim();if(!n){msg=t("err1");draw();return}
+  var em=g("dpe").trim().toLowerCase();
+  if(em&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){msg=t("e_mail");draw();return}
+  c.n=n;c.co=g("dpc").trim();c.ph=g("dpp").trim();c.em=em;
+  if(g("dpk"))c.k=g("dpk");
+  if(g("dpcu"))c.cu=g("dpcu");
+  secAud("Cliente actualizado",c.n);
+  msg=t("devSaved");persist();draw();top0();
+}
+
+function dvOps(c){
+  var svc=ORD.map(function(k){return '<option value="'+k+'">'+SV[k].n+'</option>'}).join("");
+  var pinBox=function(id){return sec.pin?'<label>'+t("secPin")+'</label><input id="'+id+'" type="password" inputmode="numeric" maxlength="8" autocomplete="off">':''};
+  return '<div class="box"><h2>'+t("devSale")+'</h2>'
+    +'<label>'+t("serv")+'</label><select id="dvs">'+svc+'</select>'
+    +'<label>'+t("amt")+' ('+esc(c.cu||"CLP")+')</label><input id="dva" type="number" min="0" step="any" inputmode="decimal">'
+    +'<label>'+t("devNote")+'</label><input id="dvnt" type="text" autocomplete="off">'
+    +'<div class="mut" style="font-size:12px;margin-top:6px">'+t("devRate")+': 1 '+esc(c.cu||"CLP")+' = '+nf(dvRate(c))+' CLP</div>'
+    +'<button class="b ok" style="width:100%;margin:12px 0 0" onclick="dvSale('+c.id+')">'+t("devSale")+'</button></div>'
+    +'<div class="box"><h2>'+t("rch")+'</h2>'
+    +'<div class="ln"><span class="mut">'+t("devWallet1")+'</span><b>'+nf(virt)+' CLP</b></div>'
+    +'<div class="ln"><span class="mut">'+t("devWallet2")+'</span><b>'+nf(virt2)+' CLP</b></div>'
+    +'<label>'+t("devWallet")+'</label><select id="dvrw"><option value="sh">'+t("devWallet1")+'</option><option value="sx">'+t("devWallet2")+'</option></select>'
+    +'<label>'+t("amt")+' ('+esc(c.cu||"CLP")+')</label><input id="dvra" type="number" min="0" step="any" inputmode="decimal">'
+    +pinBox("dvpin")
+    +'<button class="b ok" style="width:100%;margin:12px 0 0" onclick="dvRc('+c.id+')">'+t("rch")+'</button></div>'
+    +'<div class="box"><h2>'+t("rtr")+'</h2>'
+    +'<label>'+t("devWallet")+'</label><select id="dvrw2"><option value="sh">'+t("devWallet1")+'</option><option value="sx">'+t("devWallet2")+'</option></select>'
+    +'<label>'+t("amt")+' ('+esc(c.cu||"CLP")+')</label><input id="dvta" type="number" min="0" step="any" inputmode="decimal">'
+    +pinBox("dvpin2")
+    +'<button class="b no" style="width:100%;margin:12px 0 0" onclick="dvRt('+c.id+')">'+t("rtr")+'</button></div>';
+}
+
+function dvSale(id){
+  var c=dvG(id);if(!c)return;
+  if(c.bl){msg=t("blkd");draw();return}
+  var v=parseFloat((document.getElementById("dva")||{}).value||0);
+  if(!(v>0)){msg=t("err1");draw();return}
+  var r=dvRate(c),clp=Math.round(v*r);
+  if(!(clp>0)){msg=t("devRateBad");draw();return}
+  var k=(document.getElementById("dvs")||{}).value||ORD[0];if(!SV[k])k=ORD[0];
+  var nt=String((document.getElementById("dvnt")||{}).value||"").trim();
+  var g=dvGrp(k),av=Math.min(+c[g]||0,clp),left=clp-av;
+  c[g]=(+c[g]||0)-av;c.db=(+c.db||0)+left;
+  c.mv.unshift({ty:"sl",a:clp,k:k,tx:SV[k].n+(left?' · '+t("debt")+' +'+nf(left):'')+(nt?' · '+nt:''),d:dvNow(),s:dvTot(c)});
+  secAud("Venta de servicio",c.n+" · "+SV[k].n+" · "+nf(clp)+" CLP");
+  if(left>0)secAlert(1,"Deuda: "+c.n+" · "+nf(left)+" CLP");
+  msg=t("devSaved");persist();draw();top0();
+}
+
+async function dvPin(el){
+  if(!sec.pin)return true;
+  var e=document.getElementById(el||"dvpin"),v=e?String(e.value||""):"";
+  if(!v){msg=t("secPinReq");draw();return false}
+  if((await sha(v))!==sec.pin){msg=t("secPinBad");draw();return false}
+  return true;
+}
+
+async function dvRc(id){
+  var c=dvG(id);if(!c)return;
+  var v=parseFloat((document.getElementById("dvra")||{}).value||0);
+  if(!(v>0)){msg=t("err1");draw();return}
+  var r=dvRate(c),clp=Math.round(v*r);
+  if(!(clp>0)){msg=t("devRateBad");draw();return}
+  var w=(document.getElementById("dvrw")||{}).value=="sx"?"sx":"sh";
+  var pool=w=="sx"?virt2:virt;
+  if(clp>pool){msg=t("devNoFunds");draw();return}
+  if(+sec.lim.rc>0&&clp>+sec.lim.rc){msg=t("secLimHit");draw();return}
+  if(!(await dvPin("dvpin")))return;
+  if(w=="sx")virt2-=clp;else virt-=clp;
+  var pd=Math.min(+c.db||0,clp);
+  c.db=(+c.db||0)-pd;c[w]=(+c[w]||0)+clp-pd;
+  c.mv.unshift({ty:"rc",a:clp,tx:t("rch")+" · "+dvWn(w)+(pd?' · '+t("debt")+' -'+nf(pd):''),d:dvNow(),s:dvTot(c)});
+  secAud("Recarga a cliente",c.n+" · "+nf(clp)+" CLP");
+  msg=t("devSaved");persist();draw();top0();
+}
+
+async function dvRt(id){
+  var c=dvG(id);if(!c)return;
+  if(c.bl){msg=t("blkd");draw();return}
+  var v=parseFloat((document.getElementById("dvta")||{}).value||0);
+  if(!(v>0)){msg=t("err1");draw();return}
+  var r=dvRate(c),clp=Math.round(v*r);
+  if(!(clp>0)){msg=t("devRateBad");draw();return}
+  var w=(document.getElementById("dvrw2")||{}).value=="sx"?"sx":"sh";
+  if(clp>(+c[w]||0)){msg=t("devInsufficient");draw();return}
+  if(+sec.lim.rt>0&&clp>+sec.lim.rt){msg=t("secLimHit");draw();return}
+  if(+sec.lim.d>0&&dvDayOut()+clp>+sec.lim.d){msg=t("secLimHit");draw();return}
+  if(!(await dvPin("dvpin2")))return;
+  c[w]=(+c[w]||0)-clp;
+  if(w=="sx")virt2+=clp;else virt+=clp;
+  c.mv.unshift({ty:"rt",a:clp,tx:t("rtr")+" · "+dvWn(w),d:dvNow(),s:dvTot(c)});
+  secAud("Retiro de cliente",c.n+" · "+nf(clp)+" CLP");
+  msg=t("devSaved");persist();draw();top0();
+}
+
+function dvMov(c){
+  var l=c.mv||[];
+  var ty={rc:t("rch"),rt:t("rtr"),sl:t("devSale")};
+  return '<div class="box"><h2>'+t("mov")+'</h2>'+(l.length?l.map(function(m){
+    return '<div class="ch"><span style="min-width:0"><b>'+esc(ty[m.ty]||m.ty)+'</b>'+(m.tx?'<br><span class="mut" style="font-size:12px">'+esc(m.tx)+'</span>':'')+'<br><span class="mut" style="font-size:12px">'+esc(m.d||"")+'</span></span><span style="text-align:right"><b style="color:'+(m.ty=="rc"?"var(--ok)":"var(--red)")+'">'+(m.ty=="rc"?"+":"-")+dvMn(c,m.a)+'</b><br><span class="mut" style="font-size:12px">'+t("rptBal")+': '+dvMn(c,m.s)+'</span></span></div>';
+  }).join(""):'<div class="empty">'+t("empty")+'</div>')+'</div>';
+}
+
+function dvSvc(c){
+  var sv=c.sv||[];
+  return '<div class="box"><h2>'+t("serv")+' ('+sv.length+'/'+ORD.length+')</h2><div style="display:flex;flex-wrap:wrap;gap:6px">'
+    +ORD.map(function(k){var on=sv.indexOf(k)>-1;return '<button class="b '+(on?"ok":"neu")+'" style="margin:0;padding:6px 10px;font-size:13px" onclick="dvSvcT('+c.id+',\''+k+'\')">'+esc(SV[k].n)+(on?" ✓":"")+'</button>'}).join("")
+    +'</div></div>';
+}
+function dvSvcT(id,k){
+  var c=dvG(id);if(!c)return;
+  c.sv=Array.isArray(c.sv)?c.sv:[];
+  var i=c.sv.indexOf(k);if(i<0)c.sv.push(k);else c.sv.splice(i,1);
+  persist();draw();
+}
+
+function dvCfg(c){
+  return '<div class="box"><h2>'+t("segur")+'</h2>'
+    +'<button class="b '+(c.bl?"ok":"no")+'" style="width:100%;margin:0" onclick="dvBlk('+c.id+')">'+(c.bl?t("unb"):t("blk"))+'</button>'
+    +'<div class="mut" style="font-size:12px;margin-top:10px">'+t("devBlockHint")+'</div>'
+    +'<button class="b no" style="width:100%;margin:16px 0 0" onclick="dvDel('+c.id+')">'+t("del")+'</button></div>';
+}
+function dvBlk(id){
+  var c=dvG(id);if(!c)return;
+  c.bl=c.bl?0:1;
+  secAud(c.bl?"Cliente bloqueado":"Cliente desbloqueado",c.n);
+  persist();draw();
+}
+function dvDel(id){
+  var c=dvG(id);if(!c)return;
+  ask(t("devConfirmDel")+" "+c.n,function(){
+    dev.c=dev.c.filter(function(x){return String(x.id)!=String(c.id)});
+    secAud("Cliente eliminado",c.n);
+    dvSel=0;dvSub="";persist();draw();top0();
+  });
+}
+
+function vDev(){
+  dvBoot();
+  if(!esAdmin)return '<div class="box"><h2>'+t("devT")+'</h2><div class="empty">'+t("denied")+'</div></div>';
+  var tb=[["ini",t("inicio")],["usr",t("devCli")],["pnl",t("devPanel")],["rpt",t("rptT")]];
+  var h='<div class="seg" style="margin:0 0 12px">'+tb.map(function(x){return '<button class="'+(dvTab==x[0]?"on":"")+'" onclick="dvT(\''+x[0]+'\')">'+x[1]+'</button>'}).join("")+'</div>';
+  var b=dvTab=="usr"?(dvAddBox()+dvList()):dvTab=="pnl"?dvPanel():dvTab=="rpt"?vRpt():dvHome();
+  return h+b;
+}
+
+/* -------------------------------- REPORTES -------------------------------- */
+function rpTy(ty){
+  var m={op:t("ops"),rc:t("rch"),rt:t("rtr"),sl:t("devSale"),dep:t("dpo"),tr:"Transferencia",rf:t("rjd"),ka:t("kauth"),dv:t("devT")};
+  return m[ty]||ty;
+}
+function rpSet(k,v){rpD[k]=v;draw()}
+function rpClr(){rpD={u:"all",ty:"all",f:"",to:"",q:""};draw()}
+
+function rpRows(){
+  var list=[];
+  (ops||[]).forEach(function(o){
+    if(!o||o.st=="r")return;
+    list.push({d:String(o.date||"").slice(0,10),cl:srcName(o.src)||"",ty:"op",tx:(SV[o.s]?SV[o.s].n:o.s)+" #"+o.n,a:+o.tot||0});
+  });
+  (dev.c||[]).forEach(function(c){(c.mv||[]).forEach(function(m){
+    list.push({d:String(m.d||"").slice(0,10),cl:c.n||"",ty:m.ty,tx:m.tx||"",a:+m.a||0});
+  })});
+  (log||[]).forEach(function(e){
+    if(!e||e.ty=="old")return;
+    list.push({d:String(e.d||"").slice(0,10),cl:srcName(e.fr)||"",ty:e.ty,tx:e.lb||e.tx||"",a:+e.amt||0});
+  });
+  var q=String(rpD.q||"").toLowerCase();
+  return list.filter(function(x){
+    if(rpD.u!="all"&&x.cl!=rpD.u)return false;
+    if(rpD.ty!="all"&&x.ty!=rpD.ty)return false;
+    if(rpD.f&&x.d&&x.d<rpD.f)return false;
+    if(rpD.to&&x.d&&x.d>rpD.to)return false;
+    if(q&&((x.cl+" "+x.tx+" "+x.d+" "+rpTy(x.ty)).toLowerCase().indexOf(q)<0))return false;
+    return true;
+  }).sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:0});
+}
+function rpSum(rows){
+  var s={op:0,rc:0,rt:0,sl:0,n:rows.length};
+  rows.forEach(function(x){if(s[x.ty]!=null)s[x.ty]+=+x.a||0});
+  return s;
+}
+function rpRank(rows){
+  var m={};rows.forEach(function(x){
+    if(x.ty!="op"&&x.ty!="sl")return;
+    if(!x.cl)return;
+    var r=m[x.cl]||(m[x.cl]={n:x.cl,v:0,c:0});
+    r.v+=+x.a||0;r.c++;
+  });
+  var a=Object.keys(m).map(function(k){return m[k]}).sort(function(x,y){return y.v-x.v||y.c-x.c});
+  if(!a.length)return "";
+  var mx=a[0].v||1;
+  return '<div class="box"><h2>'+t("rptRank")+'</h2>'+a.slice(0,8).map(function(r,i){
+    return '<div style="margin-top:10px"><div class="ln"><span><b>'+(i<3?["🥇","🥈","🥉"][i]:"#"+(i+1))+' '+esc(r.n)+'</b> <span class="mut" style="font-size:12px">· '+r.c+'</span></span><b>'+nf(r.v)+' CLP</b></div><div style="height:6px;border-radius:3px;background:#e8ebf3;margin-top:4px"><div style="height:6px;border-radius:3px;background:#12285f;width:'+Math.max(4,Math.round(r.v/mx*100))+'%"></div></div></div>';
+  }).join("")+'</div>';
+}
+function rpCsv(){
+  var q=function(x){var v=String(x==null?"":x);if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'};
+  var out=[[t("rptDate"),t("devCli"),t("rptType"),t("rptDetail"),t("amt")].map(q).join(";")];
+  rpRows().forEach(function(x){out.push([x.d,x.cl,rpTy(x.ty),x.tx,x.a].map(q).join(";"))});
+  return "\ufeff"+out.join("\r\n");
+}
+function rpFile(name,txt,mime){
+  try{
+    var b=new Blob([txt],{type:mime||"text/csv;charset=utf-8"}),u=URL.createObjectURL(b),a=document.createElement("a");
+    a.href=u;a.download=name;a.style.display="none";document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){try{URL.revokeObjectURL(u)}catch(e){}},4000);
+    msg=t("devSaved");draw();
+  }catch(e){msg=t("nodl");draw()}
+}
+function rpPrint(){
+  var rows=rpRows();
+  var h='<!doctype html><html><head><meta charset="utf-8"><title>'+t("rptT")+'</title><style>body{font-family:system-ui,-apple-system,sans-serif;padding:24px;color:#111}h1{font-size:18px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #ddd;padding:6px;text-align:left}td:last-child,th:last-child{text-align:right}</style></head><body><h1>'+t("rptT")+'</h1><table><thead><tr><th>'+t("rptDate")+'</th><th>'+t("devCli")+'</th><th>'+t("rptType")+'</th><th>'+t("rptDetail")+'</th><th>'+t("amt")+'</th></tr></thead><tbody>'
+    +rows.map(function(x){return '<tr><td>'+esc(x.d)+'</td><td>'+esc(x.cl)+'</td><td>'+esc(rpTy(x.ty))+'</td><td>'+esc(x.tx)+'</td><td>'+nf(x.a)+'</td></tr>'}).join("")
+    +'</tbody></table></body></html>';
+  try{
+    var b=new Blob([h],{type:"text/html;charset=utf-8"}),u=URL.createObjectURL(b),w=window.open(u,"_blank");
+    setTimeout(function(){try{URL.revokeObjectURL(u)}catch(e){}},8000);
+    if(!w){msg=t("nodl");draw()}
+  }catch(e){msg=t("nodl");draw()}
+}
+function vRpt(){
+  dvBoot();
+  if(!esAdmin)return '<div class="box"><h2>'+t("rptT")+'</h2><div class="empty">'+t("denied")+'</div></div>';
+  var rows=rpRows(),s=rpSum(rows);
+  var cli={};rows.forEach(function(x){if(x.cl)cli[x.cl]=1});
+  var chip=function(k,lb){return '<button class="b '+(rpD.ty==k?"neu":"no2")+'" style="margin:0;padding:6px 12px;font-size:13px" onclick="rpSet(\'ty\',\''+k+'\')">'+lb+'</button>'};
+  var on=rpD.u!="all"||rpD.ty!="all"||rpD.f||rpD.to||rpD.q;
+  return rpRank(rows)
+    +'<div class="box"><h2>'+t("rptT")+'</h2>'
+    +'<label>'+t("devCli")+'</label><select onchange="rpSet(\'u\',this.value)"><option value="all">'+t("all")+'</option>'+Object.keys(cli).sort().map(function(k){return '<option value="'+esc(k)+'"'+(rpD.u==k?" selected":"")+'>'+esc(k)+'</option>'}).join("")+'</select>'
+    +'<div class="row" style="flex-wrap:wrap;gap:6px;margin-top:10px">'+chip("all",t("all"))+chip("op",t("ops"))+chip("rc",t("rch"))+chip("rt",t("rtr"))+chip("sl",t("devSale"))+'</div>'
+    +'<div class="row" style="gap:8px;margin-top:6px"><div style="flex:1;min-width:0"><label>'+t("rptFrom")+'</label><input type="date" value="'+esc(rpD.f)+'" onchange="rpSet(\'f\',this.value)"></div><div style="flex:1;min-width:0"><label>'+t("rptTo")+'</label><input type="date" value="'+esc(rpD.to)+'" onchange="rpSet(\'to\',this.value)"></div></div>'
+    +'<input type="text" style="margin-top:10px" placeholder="'+esc(t("rptQuery"))+'" value="'+esc(rpD.q)+'" onchange="rpSet(\'q\',this.value)" onkeydown="if(event.key==\'Enter\')rpSet(\'q\',this.value)">'
+    +'<div class="ln" style="margin-top:10px"><span class="mut">'+t("rptBill")+'</span><b style="color:var(--ok)">+'+nf(s.op)+' CLP</b></div>'
+    +'<div class="ln"><span class="mut">'+t("rptRec")+'</span><b>'+nf(s.rc)+' CLP</b></div>'
+    +'<div class="ln"><span class="mut">'+t("rptRet")+'</span><b style="color:var(--red)">-'+nf(s.rt)+' CLP</b></div>'
+    +'<div class="ln"><span class="mut">'+t("rptSold")+'</span><b>'+nf(s.sl)+' CLP</b></div>'
+    +'<div class="ln"><span class="mut">'+s.n+' '+t("rptCount")+'</span><b></b></div>'
+    +'<div class="row" style="flex-wrap:wrap;gap:6px;margin-top:8px"><button class="b" style="margin:0;padding:8px 12px;font-size:13px;background:#0891b2" onclick="rpFile(\'reporte.csv\',rpCsv())">CSV</button><button class="b" style="margin:0;padding:8px 12px;font-size:13px;background:#7c3aed" onclick="rpPrint()">'+t("pvprn")+'</button>'+(on?'<button class="b no2" style="margin:0;padding:8px 12px;font-size:13px" onclick="rpClr()">'+t("rptClear")+'</button>':'')+'</div></div>'
+    +'<div class="box">'+(rows.length?rows.slice(0,300).map(function(x){
+        var pos=x.ty=="op"||x.ty=="rc"||x.ty=="dep";
+        return '<div class="ch"><span style="min-width:0"><b>'+esc(x.cl||"—")+'</b> · '+esc(rpTy(x.ty))+'<br><span class="mut" style="font-size:12px">'+esc(x.d||"")+(x.tx?' · '+esc(x.tx):'')+'</span></span><span style="text-align:right"><b style="color:'+(pos?"var(--ok)":"var(--red)")+'">'+(pos?"+":"-")+nf(x.a)+' CLP</b></span></div>';
+      }).join(""):'<div class="empty">'+t("rptNo")+'</div>')+'</div>';
+}
+
+/* -------------------------------- SEGURIDAD ------------------------------- */
+function secGo(k){secTab=k;msg="";draw();top0()}
+async function secPinSave(){
+  var a=String((document.getElementById("sp0")||{}).value||""),
+      p=String((document.getElementById("sp1")||{}).value||""),
+      q=String((document.getElementById("sp2")||{}).value||"");
+  if(sec.pin&&(await sha(a))!==sec.pin){msg=t("secPinBad");draw();return}
+  if(!/^\d{4,8}$/.test(p)){msg=t("secPinFmt");draw();return}
+  if(p!==q){msg=t("ckDif");draw();return}
+  sec.pin=await sha(p);
+  secAud("PIN de operaciones actualizado","");
+  msg=t("secPinOk");persist();draw();top0();
+}
+async function secPinDel(){
+  if(!sec.pin)return;
+  var a=String((document.getElementById("sp0")||{}).value||"");
+  if((await sha(a))!==sec.pin){msg=t("secPinBad");draw();return}
+  sec.pin="";
+  secAud("PIN de operaciones desactivado","");
+  msg=t("secPinOk");persist();draw();
+}
+function secLimSave(){
+  var g=function(id){return Math.max(0,parseFloat((document.getElementById(id)||{}).value)||0)};
+  sec.lim={rc:g("sl1"),rt:g("sl2"),d:g("sl3")};
+  secAud("Límites actualizados",nf(sec.lim.rc)+" / "+nf(sec.lim.rt)+" / "+nf(sec.lim.d)+" CLP");
+  msg=t("devSaved");persist();draw();top0();
+}
+function secAudClear(){
+  ask(t("secConfirmClear"),function(){sec.aud=[];persist();draw()});
+}
+
+function secPinBox(){
+  var on=!!sec.pin;
+  return '<div class="box"><h2>'+t("secPin")+'</h2>'
+    +'<div class="ln"><span class="mut">'+t("secStatus")+'</span><b>'+(on?t("secPinOn"):t("secPinOff2"))+'</b></div>'
+    +'<div class="mut" style="font-size:12px;margin:6px 0 10px">'+t("secPinHint")+'</div>'
+    +(on?'<label>'+t("secPinCur")+'</label><input id="sp0" type="password" inputmode="numeric" maxlength="8" autocomplete="off">':'')
+    +'<label>'+t("secPinNew")+'</label><input id="sp1" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password">'
+    +'<label>'+t("secPinNew")+'</label><input id="sp2" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password">'
+    +'<button class="b ok" style="width:100%;margin:12px 0 0" onclick="secPinSave()">'+t("secPinSet")+'</button>'
+    +(on?'<button class="b no" style="width:100%;margin:8px 0 0" onclick="secPinDel()">'+t("secPinOff")+'</button>':'')
+    +'</div>';
+}
+function secLimBox(){
+  var L=sec.lim||{};
+  return '<div class="box"><h2>'+t("secLimits")+'</h2><div class="mut" style="font-size:12px;margin-bottom:8px">'+t("secLimitNote")+'</div>'
+    +'<label>'+t("secLimitRc")+'</label><input id="sl1" type="number" min="0" step="1000" value="'+(+L.rc||0)+'" inputmode="numeric">'
+    +'<label>'+t("secLimitRt")+'</label><input id="sl2" type="number" min="0" step="1000" value="'+(+L.rt||0)+'" inputmode="numeric">'
+    +'<label>'+t("secLimitDay")+'</label><input id="sl3" type="number" min="0" step="1000" value="'+(+L.d||0)+'" inputmode="numeric">'
+    +'<button class="b ok" style="width:100%;margin:14px 0 0" onclick="secLimSave()">'+t("save")+'</button></div>';
+}
+function secAudBox(){
+  var l=sec.aud||[];
+  return '<div class="box"><h2>'+t("secAudit")+'</h2>'+(l.length?l.map(function(e){
+    return '<div class="ch"><span style="min-width:0"><b>'+esc(e.a||"")+'</b>'+(e.d?'<br><span class="mut" style="font-size:12px">'+esc(e.d)+'</span>':'')+'</span><span class="mut" style="font-size:12px;text-align:right;white-space:nowrap">'+esc(e.t||"")+'<br>'+esc(e.u||"")+'</span></div>';
+  }).join(""):'<div class="empty">'+t("secNoEvents")+'</div>')
+  +'<button class="b no" style="width:100%;margin:12px 0 0" onclick="secAudClear()">'+t("secClearLog")+'</button></div>';
+}
+function secChkBox(){
+  var items=[
+    [sb&&sesion?1:0,t("secSessOk")],
+    [sec.pin?1:0,t("secPinOn")],
+    [(+sec.lim.rc>0||+sec.lim.rt>0||+sec.lim.d>0)?1:0,t("secLimits")],
+    [dev.c.length?1:0,t("secClients")],
+    [1,t("secSync")]
+  ];
+  return '<div class="box"><h2>'+t("secCheck")+'</h2>'+items.map(function(x){
+      return '<div class="ln"><span>'+esc(x[1])+'</span><b style="color:'+(x[0]?'var(--ok)':'var(--mut)')+'">'+(x[0]?'✓':'—')+'</b></div>';
+    }).join("")+'</div>'
+    +'<div class="box"><h2>'+t("secAlerts")+'</h2>'+((sec.al||[]).length?sec.al.map(function(a){
+      return '<div class="ch"><span style="min-width:0">'+esc(a.d||"")+'</span><span class="mut" style="font-size:12px;white-space:nowrap">'+esc(a.t||"")+'</span></div>';
+    }).join(""):'<div class="empty">'+t("secNoEvents")+'</div>')+'</div>';
+}
+function secAccList(){
+  var l=[];
+  (masters||[]).forEach(function(m){l.push([m,t("rolem")]);(m.ags||[]).forEach(function(g){l.push([g,t("rolea")])})});
+  return '<div class="box"><h2>'+t("secAccess")+'</h2>'+(l.length?l.map(function(x){
+    var a=x[0];
+    return '<div class="ch"><span style="min-width:0"><b>'+esc(a.fn||a.user||"")+'</b><br><span class="mut" style="font-size:12px">'+esc(x[1])+(a.code?' · '+esc(a.code):'')+'</span></span><span class="actb" style="'+(a.bl?'background:rgba(220,38,38,.12);color:var(--red)':'')+'">'+(a.bl?t("blkd"):t("devActive"))+'</span></div>';
+  }).join(""):'<div class="empty">'+t("empty")+'</div>')+'</div>';
+}
+function vSec(){
+  dvBoot();
+  var tb=[["cuenta",t("secAccount")],["pin",t("secPin")],["lim",t("secLimits")],["aud",t("secAudit")],["chk",t("secCheck")],["acc",t("secAccess")]];
+  var h='<div class="seg" style="margin:0 0 12px;flex-wrap:wrap">'+tb.map(function(x){return '<button class="'+(secTab==x[0]?"on":"")+'" style="flex:1 0 30%;padding:8px 4px;font-size:12px" onclick="secGo(\''+x[0]+'\')">'+x[1]+'</button>'}).join("")+'</div>';
+  var b=secTab=="pin"?secPinBox():secTab=="lim"?secLimBox():secTab=="aud"?secAudBox():secTab=="chk"?secChkBox():secTab=="acc"?secAccList():secAccBox();
+  return h+b;
+}
+function secAccBox(){
+  var u=sesion&&sesion.user?sesion.user:{};
+  var last=u.last_sign_in_at?new Date(u.last_sign_in_at).toLocaleString():t("secNoEvents");
+  return vSecAccount()
+    +'<div class="box"><h2>'+t("secSession")+'</h2>'
+    +'<div class="ln"><span class="mut">'+t("secLast")+'</span><span>'+esc(last)+'</span></div>'
+    +'<div class="ln"><span class="mut">'+t("secSync")+'</span><span>'+(sb&&sesion?"✓ Supabase":"—")+'</span></div>'
+    +'<button class="b neu" style="width:100%;margin:12px 0 0" onclick="go(\'reset\')">'+t("pwcam")+'</button></div>'
+    +'<div class="box"><h2>'+t("sec2fa")+'</h2><div class="mut" style="font-size:13px">'+t("sec2faHint")+'</div></div>';
+}
+IC.dev='<path d="M4 6h16M4 12h10M4 18h7"/><circle cx="18" cy="16" r="3"/><path d="M18 14v2l1.5 1"/>';
+IC.rpt='<path d="M4 20V6M4 20h16"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="8" width="3" height="9"/><rect x="17" y="5" width="3" height="12"/>';
+
 function drawer(){var it=function(k,l){if(!allow(k))return"";return'<button class="it'+(tab==k?" on":"")+'" onclick="go(\''+k+'\')">'+ic(k,22)+t(l)+'</button>'};
-return'<div class="ov" onclick="dr=false;draw()"></div><aside class="dr" aria-label="Menu">'+(sesion&&myRol!="admin"?'<div style="display:flex;align-items:center;gap:12px;padding:14px 12px;border-bottom:1px solid var(--line);margin-bottom:6px">'+(pfPhoto?'<img class="av" style="width:46px;height:46px;flex:none" src="'+pfPhoto+'" alt="">':'<span class="lb" style="width:46px;height:46px;border-radius:50%;font-weight:800;font-size:20px;flex:none">'+esc(String(greetName()).charAt(0).toUpperCase())+'</span>')+'<div style="flex:1;min-width:0"><b style="font-size:15px">'+esc(greetName())+'</b><br><span class="mut" style="font-size:12px">'+esc(myCode())+' · '+rolName()+'</span></div></div>':'')+it("home","inicio")+it("not","ntT")+it("send","envio")+it("fac","facT")+it("all","hist")+it("ops","ops")+it("mov","mov")+(myRol=="master"?'<button class="it'+(tab=="net"?" on":"")+'" onclick="go(\'net\')">'+ic("net",22)+'Red</button>':it("net",redKey()))+it("deu","deuT")+it("ag","pag")+it("prof","perfil")+it("sup","soporte")+it("sec","segur")+'<div style="flex:1"></div><button class="it" style="border-top:1px solid var(--line);border-radius:0;color:var(--mut)" onclick="out()">'+ic("out",22)+t("out")+'</button></aside>'}
+return'<div class="ov" onclick="dr=false;draw()"></div><aside class="dr" aria-label="Menu">'+(sesion&&myRol!="admin"?'<div style="display:flex;align-items:center;gap:12px;padding:14px 12px;border-bottom:1px solid var(--line);margin-bottom:6px">'+(pfPhoto?'<img class="av" style="width:46px;height:46px;flex:none" src="'+pfPhoto+'" alt="">':'<span class="lb" style="width:46px;height:46px;border-radius:50%;font-weight:800;font-size:20px;flex:none">'+esc(String(greetName()).charAt(0).toUpperCase())+'</span>')+'<div style="flex:1;min-width:0"><b style="font-size:15px">'+esc(greetName())+'</b><br><span class="mut" style="font-size:12px">'+esc(myCode())+' · '+rolName()+'</span></div></div>':'')+it("home","inicio")+it("not","ntT")+it("send","envio")+it("fac","facT")+it("all","hist")+it("ops","ops")+it("mov","mov")+(myRol=="master"?'<button class="it'+(tab=="net"?" on":"")+'" onclick="go(\'net\')">'+ic("net",22)+'Red</button>':it("net",redKey()))+it("deu","deuT")+it("dev","devT")+it("rpt","rptT")+it("ag","pag")+it("prof","perfil")+it("sup","soporte")+it("sec","segur")+'<div style="flex:1"></div><button class="it" style="border-top:1px solid var(--line);border-radius:0;color:var(--mut)" onclick="out()">'+ic("out",22)+t("out")+'</button></aside>'}
 function mbc(){if(!lock&&tab=="send"&&sel){if(sel=="depo"&&bk)bk="";else{sel="";d={}}draw()}else{dr=!dr;draw()}}
 function tg(){var r=document.documentElement,dk=r.dataset.theme?r.dataset.theme=="dark":matchMedia("(prefers-color-scheme: dark)").matches;r.dataset.theme=dk?"light":"dark";persist()}
 function vReset(){
@@ -1211,12 +1808,12 @@ document.getElementById("sbt").textContent=lock?"":tab=="home"?(myRol=="master"?
 var mb=document.getElementById("mb");mb.style.display=lock?"none":"";mb.innerHTML=ic(sv0?"back":"menu",26);
 document.getElementById("hr").innerHTML=lock?"":'<button class="ib" aria-label="Theme" onclick="tg()">'+ic("moon",24)+'</button><button class="ib" aria-label="Notifications" onclick="go(\'not\')">'+ic("bell",24)+(ntUnread()?'<span class="bg">'+(ntUnread()>9?"9+":ntUnread())+'</span>':'')+'</button><img class="av" src="'+(pfPhoto||LOGO.av)+'" alt="">';
 document.getElementById("dw").innerHTML=dr&&!lock?drawer():"";
-var pg={home:(myRol=="master"?vHomeM:vHome),deu:vDeu,not:vNot,send:vOps,fac:vFac,ops:vHist,mov:(myRol=="master"?vMovM:vMov),net:vRed,all:vAll,ag:vAg,prof:vProf,sup:vSup,users:vUsers,sec:vSec,reset:vReset};
+var pg={home:(myRol=="master"?vHomeM:vHome),deu:vDeu,not:vNot,send:vOps,fac:vFac,ops:vHist,mov:(myRol=="master"?vMovM:vMov),net:vRed,all:vAll,ag:vAg,prof:vProf,sup:vSup,users:vUsers,sec:vSec,dev:vDev,rpt:vRpt,reset:vReset};
 document.getElementById("main").innerHTML=lock?lockHtml():(msg?'<div class="box" role="status"><b>'+esc(msg)+'</b></div>':"")+(pend?'<div class="box" role="alertdialog" style="border:2px solid #1d4fd7"><b>'+esc(pend.txt)+'</b><div class="row" style="margin-top:10px"><button class="b" style="margin:0;background:#1f9d55" onclick="pendOk()">'+t("conf")+'</button><button class="b neu" style="margin:0" onclick="pendNo()">'+t("back")+'</button></div></div>':"")+pvHtml()+pg[tab]();eq();dtc();persist();authAfter()}
 var lastSave="",lastSent="",saveTimer=null,chan=null;
-function snap(){return JSON.stringify({virt:virt,virt2:virt2,L:L,ops:ops,log:log,cnt:cnt,mvn:mvn,rt:rt,cr:cr,biz:biz,supNum:supNum,waMode:waMode,krDef:krDef,noBal:noBal,inv:inv,nts:nts,admMail:admMail,bonus:B,ct:ct,masters:masters,pfPhoto:pfPhoto,pfPhone:pfPhone,pfMail:pfMail,tdOn:tdOn,rd:rd,th:document.documentElement.dataset.theme||"",ts:Date.now()})}
+function snap(){return JSON.stringify({virt:virt,virt2:virt2,L:L,ops:ops,log:log,cnt:cnt,mvn:mvn,rt:rt,cr:cr,biz:biz,supNum:supNum,waMode:waMode,krDef:krDef,noBal:noBal,inv:inv,nts:nts,admMail:admMail,bonus:B,ct:ct,masters:masters,pfPhoto:pfPhoto,pfPhone:pfPhone,pfMail:pfMail,tdOn:tdOn,dev:dev,sec:sec,rd:rd,th:document.documentElement.dataset.theme||"",ts:Date.now()})}
 function snapKey(){var o=JSON.parse(snap());delete o.ts;return JSON.stringify(o)}
-function apply(o){if(!o)return;virt=(o.virt||0)+(o.vrt||0);virt2=o.virt2||0;L=o.L||0;ops=o.ops||[];log=(o.log||[]).map(function(e,i){return Array.isArray(e)?{n:-(i+1),ty:"old",lb:e[0],tx:e[1],st:"ok",d:""}:e});mvn=o.mvn||0;cnt=o.cnt||0;if(o.rt)rt=o.rt;if(o.cr)cr=Object.assign({MXN:52},o.cr);biz=String(o.biz||biz).replace(/\bS\.A\.?/gi,"SPA");supNum=o.supNum||"+56927082980";waMode=o.waMode||"ma";ct=o.ct||"ht";masters=o.masters||[];krDef=o.krDef||0;noBal=!!o.noBal;nts=o.nts||[];admMail=o.admMail||admMail;B=Object.assign({on:true,min:25000,pct:14,gon:true,gmin:25000,gpct:3},o.bonus||{});masters.forEach(function(m){if(!m.code)m.code=newCode("MA");mig(m);(m.ags||[]).forEach(function(g){if(!g.code)g.code=newCode("AG");mig(g)})});inv=o.inv||[];inv.forEach(function(x){var q=ops.filter(function(z){return z.n==x.n})[0];if(q)x.r=refNo(q,x.k)});masters.forEach(function(m){[m].concat(m.ags||[]).forEach(function(a){if(a.saldo<0){a.db=(a.db||0)-a.saldo;a.saldo=0}if(a.dt){if(a.kr==null)a.kr=a.dl>0?a.dl:1e9;delete a.dt;delete a.dl}})});pfPhoto=o.pfPhoto||"";pfPhone=o.pfPhone||"";pfMail=o.pfMail||"";tdOn=o.tdOn!==false;rd=o.rd||"";if(o.th)document.documentElement.dataset.theme=o.th;document.documentElement.lang=["ht","es","fr","en","zh","pt"][L];last=null}
+function apply(o){if(!o)return;virt=(o.virt||0)+(o.vrt||0);virt2=o.virt2||0;L=o.L||0;ops=o.ops||[];log=(o.log||[]).map(function(e,i){return Array.isArray(e)?{n:-(i+1),ty:"old",lb:e[0],tx:e[1],st:"ok",d:""}:e});mvn=o.mvn||0;cnt=o.cnt||0;if(o.rt)rt=o.rt;if(o.cr)cr=Object.assign({MXN:52},o.cr);biz=String(o.biz||biz).replace(/\bS\.A\.?/gi,"SPA");supNum=o.supNum||"+56927082980";waMode=o.waMode||"ma";ct=o.ct||"ht";masters=o.masters||[];krDef=o.krDef||0;noBal=!!o.noBal;nts=o.nts||[];admMail=o.admMail||admMail;B=Object.assign({on:true,min:25000,pct:14,gon:true,gmin:25000,gpct:3},o.bonus||{});masters.forEach(function(m){if(!m.code)m.code=newCode("MA");mig(m);(m.ags||[]).forEach(function(g){if(!g.code)g.code=newCode("AG");mig(g)})});inv=o.inv||[];inv.forEach(function(x){var q=ops.filter(function(z){return z.n==x.n})[0];if(q)x.r=refNo(q,x.k)});masters.forEach(function(m){[m].concat(m.ags||[]).forEach(function(a){if(a.saldo<0){a.db=(a.db||0)-a.saldo;a.saldo=0}if(a.dt){if(a.kr==null)a.kr=a.dl>0?a.dl:1e9;delete a.dt;delete a.dl}})});pfPhoto=o.pfPhoto||"";pfPhone=o.pfPhone||"";pfMail=o.pfMail||"";tdOn=o.tdOn!==false;rd=o.rd||"";dev=o.dev&&typeof o.dev=="object"&&o.dev.c?o.dev:dev;sec=o.sec&&typeof o.sec=="object"?o.sec:sec;dvBoot();if(o.th)document.documentElement.dataset.theme=o.th;document.documentElement.lang=["ht","es","fr","en","zh","pt"][L];last=null}
 function persist(){var k=snapKey();if(k==lastSave)return;lastSave=k;if(saveTimer)clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,500)}
 async function saveNow(){if(!sb||!sesion)return;var k=lastSave;if(k==lastSent)return;var o=null;try{o=JSON.parse(snap())}catch(e){}if(!o)return;
 var row={id:"panel",data:o,saldos:{virt:o.virt,virt2:o.virt2,masters:o.masters,rt:o.rt,cr:o.cr},ops:{ops:o.ops,log:o.log,mvn:o.mvn},nts:o.nts,inv:o.inv,cfg:{biz:o.biz,supNum:o.supNum,waMode:o.waMode,krDef:o.krDef,ct:o.ct,tdOn:o.tdOn,rd:o.rd,L:o.L,th:o.th,pfPhoto:o.pfPhoto,pfPhone:o.pfPhone,pfMail:o.pfMail,cnt:o.cnt}};
